@@ -1,0 +1,157 @@
+@import org.rythmengine.exception.*
+@import org.rythmengine.spring.web.servlet.view.*
+@args Exception exception
+@{
+    org.rythmengine.RythmEngine _rythm = __engine();
+    StackTraceElement head = RythmExceptionHandler.Util.head(exception);
+    List<StackTraceElement> tail = RythmExceptionHandler.Util.tail(exception);
+}
+<style type="text/css">
+    html, body, pre {
+        margin: 0;
+        padding: 0;
+        font-family: Monaco, 'Lucida Console';
+        background: #ECECEC;
+    }
+    h1 {
+        margin: 0;
+        background: #A31012;
+        padding: 20px 45px;
+        color: #fff;
+        text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+        border-bottom: 1px solid #690000;
+        font-size: 28px;
+    }
+    p#detail {
+        margin: 0;
+        padding: 15px 45px;
+        background: #F5A0A0;
+        border-top: 4px solid #D36D6D;
+        color: #730000;
+        text-shadow: 1px 1px 1px rgba(255,255,255,.3);
+        font-size: 14px;
+        border-bottom: 1px solid #BA7A7A;
+    }
+    p#detail input {
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#AE1113), to(#A31012));
+        border: 1px solid #790000;
+        padding: 3px 10px;
+        text-shadow: 1px 1px 0 rgba(0, 0, 0, .5);
+        color: white;
+        border-radius: 3px;
+        cursor: pointer;
+        font-family: Monaco, 'Lucida Console';
+        font-size: 12px;
+        margin: 0 10px;
+        display: inline-block;
+        position: relative;
+        top: -1px;
+    }
+    h2 {
+        margin: 0;
+        padding: 5px 45px;
+        font-size: 12px;
+        background: #333;
+        color: #fff;
+        text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+        border-top: 4px solid #2a2a2a;
+    }
+    pre {
+        margin: 0;
+        border-bottom: 1px solid #DDD;
+        text-shadow: 1px 1px 1px rgba(255,255,255,.5);
+        position: relative;
+        font-size: 12px;
+        overflow: hidden;
+    }
+    pre span.line {
+        text-align: right;
+        display: inline-block;
+        padding: 5px 5px;
+        width: 30px;
+        background: #D6D6D6;
+        color: #8B8B8B;
+        text-shadow: 1px 1px 1px rgba(255,255,255,.5);
+        font-weight: bold;
+    }
+    pre span.code {
+        padding: 5px 5px;
+        position: absolute;
+        right: 0;
+        left: 40px;
+    }
+    pre:first-child span.code {
+        border-top: 4px solid #CDCDCD;
+    }
+    pre:first-child span.line {
+        border-top: 4px solid #B6B6B6;
+    }
+    pre.error span.line {
+        background: #A31012;
+        color: #fff;
+        text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+    }
+    pre.error span.code {
+        font-weight: bold;
+    }
+    pre.error {
+        color: #A31012;
+    }
+    pre.error span.marker {
+        background: #A31012;
+        color: #fff;
+        text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+    }
+    #more {
+        padding: 8px;
+        font-size: 12px;
+    }
+    pre.error:hover {
+        cursor: pointer;
+    }
+    pre.error:hover span.code {
+        background-color: #D38989;
+    }
+</style>
+
+@if (exception instanceof RythmException) {
+    @{final RythmException rex = (RythmException)exception}
+    <h1>@rex.errorTitle()</h1>
+    <p id="detail">@rex.errorDesc().raw()</p>
+
+    @{
+        String tmpl = rex.getTemplateName();
+        int errLineNo = rex.templateLineNumber;
+    }
+    <h2>In @tmpl (around line @errLineNo)</h2>
+    <div>
+    @{
+        final List<String> source = Arrays.asList(rex.templateSource.split("\n"));
+        final int from = errLineNo - 5 >= 0 && errLineNo < source.size() ? errLineNo - 5 : 0;
+        final int to = errLineNo + 5  < source.size() ? errLineNo + 5 : source.size()-1;
+        final List<String> lines = new ArrayList();
+        for (int i = from; i <= to; ++i) {
+            lines.add(source.get(i));
+        }
+    }
+    @for (String line: lines) {
+        @//line_index + @from | @rex.templateLineNumber
+        <pre @if(rex.templateLineNumber == line_index+from) {class="error" data-src="@tmpl" data-line="@errLineNo"}><span class="line">@(line_index+from)</span><span class="code">&nbsp;@org.rythmengine.utils.S.escapeXml(line).toString().replace("&darr;", "<strong>&darr;</strong>").replace("\000", "<em>").replace("\001", "</em>").raw()</span></pre>
+    }
+    </div>
+
+} else {
+    <div id="header" class="block">
+        <h1>Internal Error</h1>
+        <p id="detail">@exception.getClass().getName(): <strong>@exception.getMessage()</strong></p>
+        <h2>In @head.getFileName() (around line @head.getLineNumber(): @(head.getClassName()).@(head.isNativeMethod() ? "native method" : head.getMethodName()))</h2>
+        @for (StackTraceElement el: tail) {
+        <pre><span class="line">@el_index</span><span class="code">@el</span></pre>
+        }
+        @if (tail.size() > 14) {
+        <div id="more" class="block">
+            The full stack trace of the root cause is available in the Apache Tomcat/7.0.37 logs...
+        </div>
+        }
+    </div>
+}
