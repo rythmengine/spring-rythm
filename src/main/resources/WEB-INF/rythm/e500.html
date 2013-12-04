@@ -146,12 +146,21 @@
         <p id="detail">@exception.getClass().getName(): <strong>@exception.getMessage()</strong></p>
         <h2>In @head.getFileName() (around line @head.getLineNumber(): @(head.getClassName()).@(head.isNativeMethod() ? "native method" : head.getMethodName()))</h2>
         @for (StackTraceElement el: tail) {
-        <pre><span class="line">@el_index</span><span class="code">@el</span></pre>
+            <pre><span class="line">@el_index</span><span class="code">@el</span></pre>
         }
-        @if (tail.size() > 14) {
-        <div id="more" class="block">
-            The full stack trace of the root cause is available in the Apache Tomcat/7.0.37 logs...
-        </div>
+        @// output causes
+        @for(Throwable cause = exception.getCause();cause != null;cause = cause.getCause()) {
+            @{
+                head = RythmExceptionHandler.Util.head(cause);
+                tail = RythmExceptionHandler.Util.tail(cause);
+            }
+            <h2>Casued by <strong>@cause.getMessage()</strong> in @head.getFileName() (around line @head.getLineNumber(): @(head.getClassName()).@(head.isNativeMethod() ? "native method" : head.getMethodName()))</h2>
+            @for (StackTraceElement el: tail) {
+            <pre><span class="line">@el_index</span><span class="code">@el</span></pre>
+            }
         }
+    </div>
+    <div id="more" class="block">
+        The full stack trace of the root cause is available in the server logs...
     </div>
 }
