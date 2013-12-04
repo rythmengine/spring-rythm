@@ -1,4 +1,4 @@
-package org.rythmengine.spring.ui;
+package org.rythmengine.spring;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -7,7 +7,6 @@ import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.ITemplateResourceLoader;
-import org.rythmengine.spring.Version;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -23,7 +22,7 @@ import java.util.*;
  * Factory that configures a RythmEngine. Can be used standalone,
  * but typically you will either use {@link RythmEngineFactoryBean}
  * for preparing a RythmEngine as bean reference, or
- * {@link org.rythmengine.spring.web.servlet.view.RythmConfigurer}
+ * {@link org.rythmengine.spring.web.RythmConfigurer}
  * for web views.
  *
  * <p>The optional "configLocation" property sets the location of the Rythm
@@ -47,8 +46,8 @@ import java.util.*;
  * @see #setSettings
  * @see #setResourceLoaderPath
  * @see #createRythmEngine
- * @see org.rythmengine.spring.ui.RythmEngineFactoryBean
- * @see org.rythmengine.spring.web.servlet.view.RythmConfigurer
+ * @see RythmEngineFactoryBean
+ * @see org.rythmengine.spring.web.RythmConfigurer
  * @see org.rythmengine.RythmEngine
  */
 public class RythmEngineFactory extends ApplicationObjectSupport {
@@ -120,7 +119,7 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 	 * forever (for example for class path resources).
 	 * @see #setResourceLoader
 	 * @see #setSettings
-	 * @see org.rythmengine.spring.ui.SpringResourceLoader
+	 * @see SpringResourceLoader
 	 * @see org.rythmengine.resource.FileResourceLoader
 	 */
 	public void setResourceLoaderPath(String resourceLoaderPath) {
@@ -211,7 +210,7 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
             loaders = new ArrayList<ITemplateResourceLoader>();
             String[] paths = StringUtils.commaDelimitedListToStringArray(resourceLoaderPath);
             for (String path : paths) {
-                loaders.add(new org.rythmengine.spring.ui.SpringResourceLoader(path, resourceLoader));
+                loaders.add(new SpringResourceLoader(path, resourceLoader));
             }
             p.put(RythmConfigurationKey.RESOURCE_LOADER_IMPLS.getKey(), loaders);
             p.put(RythmConfigurationKey.RESOURCE_DEF_LOADER_ENABLED.getKey(), false);

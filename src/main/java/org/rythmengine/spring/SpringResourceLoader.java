@@ -1,4 +1,4 @@
-package org.rythmengine.spring.ui;
+package org.rythmengine.spring;
 
 import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.resource.ResourceLoaderBase;
@@ -20,7 +20,7 @@ import org.springframework.core.io.ResourceLoader;
  * {@code org.springframework.core.io.ResourceLoader}, the latter a String.
  *
  * @author Gelin Luo
- * @see org.rythmengine.spring.ui.RythmEngineFactory#setResourceLoaderPath
+ * @see RythmEngineFactory#setResourceLoaderPath
  * @see org.springframework.core.io.ResourceLoader
  * @see org.rythmengine.resource.FileResourceLoader
  * @since 14.03.2004

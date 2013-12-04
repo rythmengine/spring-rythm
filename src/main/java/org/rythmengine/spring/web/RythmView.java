@@ -1,4 +1,4 @@
-package org.rythmengine.spring.web.servlet.view;
+package org.rythmengine.spring.web;
 
 import org.rythmengine.RythmEngine;
 import org.rythmengine.exception.RythmException;
@@ -129,7 +129,6 @@ public class RythmView extends AbstractTemplateView {
     }
 
     static final ThreadLocal<Map<String, Object>> renderArgs = new ThreadLocal<Map<String, Object>>();
-
 
     @Override
     protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {

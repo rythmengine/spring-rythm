@@ -1,4 +1,4 @@
-package org.rythmengine.spring.ui;
+package org.rythmengine.spring;
 
 import org.rythmengine.extension.ITemplateResourceLoader;
 import org.rythmengine.logger.ILogger;

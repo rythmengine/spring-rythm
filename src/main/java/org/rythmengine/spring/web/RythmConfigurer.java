@@ -1,10 +1,10 @@
-package org.rythmengine.spring.web.servlet.view;
+package org.rythmengine.spring.web;
 
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.ISourceCodeEnhancer;
-import org.rythmengine.spring.ui.RythmEngineFactory;
+import org.rythmengine.spring.RythmEngineFactory;
 import org.rythmengine.template.ITemplate;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
@@ -27,7 +27,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Configuration
-@ComponentScan("org.rythmengine.spring.web.servlet.view")
+@ComponentScan("org.rythmengine.spring.web")
 public class RythmConfigurer extends RythmEngineFactory implements RythmConfig, InitializingBean, ResourceLoaderAware, ServletContextAware {
 
     /**

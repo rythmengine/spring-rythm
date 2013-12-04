@@ -1,4 +1,4 @@
-package org.rythmengine.spring.web.servlet.view;
+package org.rythmengine.spring.web;
 
 import org.rythmengine.RythmEngine;
 

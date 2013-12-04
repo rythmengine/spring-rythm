@@ -1,4 +1,4 @@
-package org.rythmengine.spring.ui;
+package org.rythmengine.spring;
 
 import org.rythmengine.RythmEngine;
 import org.rythmengine.exception.RythmException;
@@ -18,7 +18,7 @@ import java.io.IOException;
  * you do not need any further configuration then. For example, in a web
  * application context:
  *
- * <pre class="code"> &lt;bean id="RythmEngine" class="org.rythmengine.spring.ui.RythmEngineFactoryBean"&gt;
+ * <pre class="code"> &lt;bean id="RythmEngine" class="org.rythmengine.spring.RythmEngineFactoryBean"&gt;
  *   &lt;property name="resourceLoaderPath" value="/WEB-INF/rythm/"/&gt;
  * &lt;/bean&gt;</pre>
  *
@@ -28,7 +28,7 @@ import java.io.IOException;
  * @see #setConfigLocation
  * @see #setSettings
  * @see #setResourceLoaderPath
- * @see org.springframework.web.servlet.view.rythm.RythmConfigurer
+ * @see org.rythmengine.spring.web.RythmConfigurer
  */
 public class RythmEngineFactoryBean extends RythmEngineFactory
 		implements FactoryBean<RythmEngine>, InitializingBean, ResourceLoaderAware {
