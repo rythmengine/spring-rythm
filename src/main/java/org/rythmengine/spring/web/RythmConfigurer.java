@@ -11,6 +11,7 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Configuration
+@EnableWebMvc
 @ComponentScan("org.rythmengine.spring.web")
 public class RythmConfigurer extends RythmEngineFactory implements RythmConfig, InitializingBean, ResourceLoaderAware, ServletContextAware {
 
@@ -85,8 +87,9 @@ public class RythmConfigurer extends RythmEngineFactory implements RythmConfig, 
 
     @Override
     protected void configRythm(Map<String, Object> config) {
-        config.put(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER.getKey(), new ISourceCodeEnhancer(){
+        config.put(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER.getKey(), new ISourceCodeEnhancer() {
             ImplicitVariables implicitVariables = new ImplicitVariables(underscoreImplicitVariableName);
+
             @Override
             public List<String> imports() {
                 List<String> l = new ArrayList<String>();
@@ -131,4 +134,5 @@ public class RythmConfigurer extends RythmEngineFactory implements RythmConfig, 
     public void setServletContext(ServletContext servletContext) {
         ctx = servletContext;
     }
+
 }

@@ -64,7 +64,10 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 
 	private Boolean devMode = null;
 
+	private DevModeSensor devModeSensor;
+
     private Map<String, Object> usrCtx = new HashMap<String, Object>();
+
 
 	/**
 	 * Set the location of the Rythm config file.
@@ -88,8 +91,8 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 	 * @see #setConfigLocation
 	 * @see #setResourceLoaderPath
 	 */
-	public void setSettings(Properties rythmProperties) {
-		CollectionUtils.mergePropertiesIntoMap(rythmProperties, this.settings);
+	public void setSettings(Properties settings) {
+		CollectionUtils.mergePropertiesIntoMap(settings, this.settings);
 	}
 
 	/**
@@ -148,6 +151,18 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 	    this.devMode = mode;
 	}
 
+    public void setDevModeSensor(String devModeSensor) throws Exception {
+            Class<DevModeSensor> c = (Class<DevModeSensor>)Class.forName(devModeSensor);
+            this.devModeSensor = c.newInstance();
+    }
+
+    protected DevModeSensor getDevModeSensor() {
+        if (null == devModeSensor) {
+            devModeSensor = new DevModeSensor.DefaultDevModeSensor(getApplicationContext());
+        }
+        return devModeSensor;
+    }
+
 	protected boolean isDevMode() {
 	    return this.devMode;
 	}
@@ -158,6 +173,12 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
      */
 	protected void configRythm(Map<String, Object> config) {
 	}
+
+	private boolean getDevModeFromDevModeSensor() {
+        boolean mode = getDevModeSensor().isDevMode();
+        setDevMode(mode);
+        return mode;
+    }
 
 	/**
 	 * Prepare the RythmEngine instance and return it.
@@ -192,12 +213,11 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
                 String s = p.get(k).toString();
                 devMode = Rythm.Mode.dev.name().equalsIgnoreCase(s);
             } else {
-                devMode = false;
+                devMode = getDevModeFromDevModeSensor();
             }
-        } else {
-            Rythm.Mode mode = devMode ? Rythm.Mode.dev : Rythm.Mode.prod;
-            p.put(RythmConfigurationKey.ENGINE_MODE.getKey(), mode);
         }
+        Rythm.Mode mode = devMode ? Rythm.Mode.dev : Rythm.Mode.prod;
+        p.put(RythmConfigurationKey.ENGINE_MODE.getKey(), mode);
 
         // the i18 message resolver
         SpringI18nMessageResolver i18n = new SpringI18nMessageResolver();
