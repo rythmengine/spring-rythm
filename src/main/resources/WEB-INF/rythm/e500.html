@@ -112,6 +112,9 @@
     pre.error:hover span.code {
         background-color: #D38989;
     }
+    div.hidden {display: none;}
+    span.expand {cursor: pointer; border: 1px solid #666; padding: 1px 5px; font-weight: normal; width: 90px; text-align: center;display:inline-block;}
+    span.expand:hover {background: #666;}
 </style>
 
 @if (exception instanceof RythmException) {
@@ -149,18 +152,37 @@
             <pre><span class="line">@el_index</span><span class="code">@el</span></pre>
         }
         @// output causes
-        @for(Throwable cause = exception.getCause();cause != null;cause = cause.getCause()) {
+        @{int causeId = 0}
+        @for(Throwable cause = exception.getCause();cause != null;cause = cause.getCause(), causeId++) {
             @{
                 head = RythmExceptionHandler.Util.head(cause);
                 tail = RythmExceptionHandler.Util.tail(cause);
             }
-            <h2>Casued by <strong>@cause.getMessage()</strong> in @head.getFileName() (around line @head.getLineNumber(): @(head.getClassName()).@(head.isNativeMethod() ? "native method" : head.getMethodName()))</h2>
+            <h2>Casued by <strong>@cause.getMessage()</strong> in @head.getFileName() (around line @head.getLineNumber(): @(head.getClassName()).@(head.isNativeMethod() ? "native method" : head.getMethodName()))
+            <span class="expand" data-id="cause-@causeId" onclick="expand('cause-@causeId', this)">expand >></span>
+            </h2>
+            <div class="hidden" id="cause-@causeId">
             @for (StackTraceElement el: tail) {
             <pre><span class="line">@el_index</span><span class="code">@el</span></pre>
             }
+            </div>
         }
     </div>
     <div id="more" class="block">
         The full stack trace of the root cause is available in the server logs...
     </div>
 }
+<script>
+    function expand(causeId, button) {
+        var div = document.getElementById(causeId);
+        if (div) {
+            if (div.className == 'hidden') {
+                div.className = '';
+                button.innerHTML = 'collapse <<';
+            } else {
+                div.className = 'hidden';
+                button.innerHTML = 'expand >>';
+            }
+        }
+    }
+</script>
