@@ -32,7 +32,8 @@ public class MvcConfigurer extends WebMvcConfigurerAdapter implements Applicatio
         if (engine.conf().cacheDisabled()) return;
         CacheHandlerInterceptor hi = new CacheHandlerInterceptor();
         hi.setApplicationContext(ctx);
-        registry.addInterceptor(new CacheHandlerInterceptor());
+        hi.setEngine(engine);
+        registry.addInterceptor(hi);
     }
 
     @Override

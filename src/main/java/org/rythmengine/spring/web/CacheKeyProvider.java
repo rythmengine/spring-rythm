@@ -1,5 +1,6 @@
 package org.rythmengine.spring.web;
 
+import org.rythmengine.utils.S;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -26,7 +27,7 @@ public interface CacheKeyProvider {
         @Override
         public String getKey(boolean sessionSensitive, boolean schemeSensitive, boolean langSensitive) {
             HttpServletRequest req = req();
-            String key = "rythm" + req.getRequestURI() + req.getQueryString();
+            String key = "rythm" + req.getRequestURI() + S.str(req.getQueryString());
             if (sessionSensitive) {
                 HttpSession sess = session(req);
                 if (null != sess) {

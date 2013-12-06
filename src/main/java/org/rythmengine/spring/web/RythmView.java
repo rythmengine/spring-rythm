@@ -174,6 +174,10 @@ public class RythmView extends AbstractTemplateView {
             // t.render(response.getOutputStream());
             String s = t.render();
             IO.writeContent(s, response.getWriter());
+            CacheHandlerInterceptor.KeyAndTTL kt = CacheHandlerInterceptor.currentCacheKey();
+            if (null != kt) {
+                engine.cache(kt.key, s, kt.ttl);
+            }
         } catch (RythmException e) {
             engine.render(response.getOutputStream(), "errors/500.html", e);
         } finally {
