@@ -7,6 +7,7 @@ import org.rythmengine.extension.ISourceCodeEnhancer;
 import org.rythmengine.spring.RythmEngineFactory;
 import org.rythmengine.template.ITemplate;
 import org.rythmengine.utils.S;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ComponentScan;
@@ -39,7 +40,10 @@ import java.util.Map;
 @Configuration
 @EnableWebMvc
 @ComponentScan("org.rythmengine.spring.web")
-public class RythmConfigurer extends RythmEngineFactory implements RythmHolder, InitializingBean, ResourceLoaderAware, ServletContextAware, WebMvcConfigurer {
+public class RythmConfigurer extends RythmEngineFactory implements
+    RythmHolder, InitializingBean, DisposableBean,
+    ResourceLoaderAware, ServletContextAware,
+    WebMvcConfigurer {
 
     /**
      * so that app developer can retrieve the servlet context with
@@ -174,6 +178,13 @@ public class RythmConfigurer extends RythmEngineFactory implements RythmHolder, 
         inst = this;
     }
 
+    @Override
+    public void destroy() throws Exception {
+        if (null != engine) {
+            engine.shutdown();
+        }
+    }
+
     private Map<String, Object> userContext = new HashMap<String, Object>();
 
     private void setUserContext(String key, Object v) {
@@ -182,6 +193,13 @@ public class RythmConfigurer extends RythmEngineFactory implements RythmHolder, 
 
     @Override
     protected void configRythm(Map<String, Object> config) {
+//        WebApplicationContext ctx = (WebApplicationContext)getApplicationContext();
+//        if (!config.containsKey(RythmConfigurationKey.HOME_TMP.getKey())) {
+//            File tmpdir = (File)ctx.getServletContext().getAttribute("javax.servlet.context.tempdir");
+//            if (null != tmpdir) {
+//                config.put(RythmConfigurationKey.HOME_TMP.getKey(), new File(tmpdir, "__rythm"));
+//            }
+//        }
         config.put(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER.getKey(), new ISourceCodeEnhancer() {
             ImplicitVariables implicitVariables = new ImplicitVariables(underscoreImplicitVariableName);
 
