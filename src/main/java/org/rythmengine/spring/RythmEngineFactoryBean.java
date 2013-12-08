@@ -26,7 +26,7 @@ import java.io.IOException;
  *
  * @author Gelin Luo
  * @see #setConfigLocation
- * @see #setSettings
+ * @see #setEngineConfig
  * @see #setResourceLoaderPath
  * @see org.rythmengine.spring.web.RythmConfigurer
  */

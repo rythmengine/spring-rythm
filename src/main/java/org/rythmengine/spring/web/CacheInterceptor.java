@@ -3,9 +3,6 @@ package org.rythmengine.spring.web;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.utils.IO;
 import org.rythmengine.utils.S;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -19,14 +16,13 @@ import java.util.Set;
 /**
  * Created by luog on 5/12/13.
  */
-public class CacheHandlerInterceptor extends HandlerInterceptorAdapter implements ApplicationContextAware {
+public class CacheInterceptor extends HandlerInterceptorAdapter {
 
     static class KeyAndTTL {
         String key;
         String ttl;
     }
 
-    private ApplicationContext ctx;
     private RythmEngine engine;
 
     private Map<Object, CacheFor> cacheForCache = new HashMap<Object, CacheFor>();
@@ -89,11 +85,6 @@ public class CacheHandlerInterceptor extends HandlerInterceptorAdapter implement
             IO.writeContent(o.toString(), response.getWriter());
             return false;
         }
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.ctx = applicationContext;
     }
 
     @Override

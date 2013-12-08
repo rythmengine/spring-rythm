@@ -1,6 +1,7 @@
 package org.rythmengine.spring;
 
 import org.rythmengine.utils.IO;
+import org.springframework.core.SpringVersion;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,4 +16,6 @@ public enum Version {
     static {
         VALUE = IO.readContentAsString(Version.class.getClassLoader().getResourceAsStream("spring-rythm-version"));
     }
+
+    public static final String SPRING_VERSION = SpringVersion.getVersion();
 }

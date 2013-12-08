@@ -1,7 +1,5 @@
 package org.rythmengine.spring.web;
 
-import org.rythmengine.RythmEngine;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -47,33 +45,7 @@ class ImplicitVariables {
                 new Var("request", HttpServletRequest.class.getName(), underscoreImplicitVariableName),
                 new Var("response", HttpServletResponse.class.getName(), underscoreImplicitVariableName),
                 new Var("session", HttpSession.class.getName(), underscoreImplicitVariableName),
-                new Var("rythm", RythmEngine.class.getName(), underscoreImplicitVariableName) {
-                    @Override
-                    String name() {
-                        return "rythm";
-                    }
-
-                    @Override
-                    protected Object evaluate() {
-                        Map<String, Object> renderArgs = RythmView.renderArgs.get();
-                        if (null == renderArgs) return null;
-                        return renderArgs.get("_rythm");
-                    }
-                },
-                new Var("_rythm", RythmEngine.class.getName(), underscoreImplicitVariableName) {
-                    @Override
-                    String name() {
-                        return "_rythm";
-                    }
-
-                    @Override
-                    protected Object evaluate() {
-                        Map<String, Object> renderArgs = RythmView.renderArgs.get();
-                        if (null == renderArgs) return null;
-                        return renderArgs.get("_rythm");
-                    }
-                }
-
+                new Var("csrf", Csrf.class.getName(), underscoreImplicitVariableName),
                 // TODO: add Locale
         };
         this.vars = Arrays.asList(vars);

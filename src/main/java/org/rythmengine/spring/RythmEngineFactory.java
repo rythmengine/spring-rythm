@@ -27,7 +27,7 @@ import java.util.*;
  *
  * <p>The optional "configLocation" property sets the location of the Rythm
  * properties file, within the current application. Rythm properties can be
- * overridden via "settings", or even completely specified locally,
+ * overridden via "engineConfig", or even completely specified locally,
  * avoiding the need for an external properties file.
  *
  * <p>The "resourceLoaderPath" property can be used to specify the Rythm
@@ -43,7 +43,7 @@ import java.util.*;
  *
  * @author Juergen Hoeller
  * @see #setConfigLocation
- * @see #setSettings
+ * @see #setEngineConfig
  * @see #setResourceLoaderPath
  * @see #createRythmEngine
  * @see RythmEngineFactoryBean
@@ -56,7 +56,7 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 
 	private Resource configLocation;
 
-	private final Map<String, Object> settings = new HashMap<String, Object>();
+	private final Map<String, Object> engineConfig = new HashMap<String, Object>();
 
 	private String resourceLoaderPath;
 
@@ -66,43 +66,53 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 
 	private DevModeSensor devModeSensor;
 
+	protected boolean enableCache = true;
+
     private Map<String, Object> usrCtx = new HashMap<String, Object>();
 
 
 	/**
 	 * Set the location of the Rythm config file.
 	 * Alternatively, you can specify all properties locally.
-	 * @see #setSettings
+	 * @see #setEngineConfig
 	 * @see #setResourceLoaderPath
 	 */
 	public void setConfigLocation(Resource configLocation) {
 		this.configLocation = configLocation;
 	}
 
+    /**
+     * Turn on/off Rythm Cache. By default Rythm Cache is turned on
+     * @param enableCache when {@code true} the cache is turned on, otherwise off
+     */
+    public void setEnableCache(boolean enableCache) {
+        this.enableCache = enableCache;
+    }
+
 	/**
-	 * Set Rythm settings, like "file.resource.loader.path".
+	 * Set Rythm engineConfig, like "file.resource.loader.path".
 	 * Can be used to override values in a Rythm config file,
 	 * or to specify all necessary properties locally.
 	 * <p>Note that the Rythm resource loader path also be set to any
 	 * Spring resource location via the "resourceLoaderPath" property.
 	 * Setting it here is just necessary when using a non-file-based
 	 * resource loader.
-	 * @see #setSettingsMap
+	 * @see #setEngineConfigMap
 	 * @see #setConfigLocation
 	 * @see #setResourceLoaderPath
 	 */
-	public void setSettings(Properties settings) {
-		CollectionUtils.mergePropertiesIntoMap(settings, this.settings);
+	public void setEngineConfig(Properties engineConfig) {
+		CollectionUtils.mergePropertiesIntoMap(engineConfig, this.engineConfig);
 	}
 
 	/**
 	 * Set Rythm properties as Map, to allow for non-String values
 	 * like "ds.resource.loader.instance".
-	 * @see #setSettings
+	 * @see #setEngineConfig
 	 */
-	public void setSettingsMap(Map<String, Object> rythmPropertiesMap) {
-		if (rythmPropertiesMap != null) {
-			this.settings.putAll(rythmPropertiesMap);
+	public void setEngineConfigMap(Map<String, Object> engineConfigMap) {
+		if (engineConfigMap != null) {
+			this.engineConfig.putAll(engineConfigMap);
 		}
 	}
 
@@ -121,7 +131,7 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 	 * detect changes. With SpringResourceLoader, the resource will be cached
 	 * forever (for example for class path resources).
 	 * @see #setResourceLoader
-	 * @see #setSettings
+	 * @see #setEngineConfig
 	 * @see SpringResourceLoader
 	 * @see org.rythmengine.resource.FileResourceLoader
 	 */
@@ -201,13 +211,13 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 
 
 		// Merge local properties if set.
-		if (!this.settings.isEmpty()) {
-			p.putAll(this.settings);
+		if (!this.engineConfig.isEmpty()) {
+			p.putAll(this.engineConfig);
 		}
 
 		// Set dev mode
         if (null == devMode) {
-            // check if devMode is set in settings
+            // check if devMode is set in engineConfig
             String k = RythmConfigurationKey.ENGINE_MODE.getKey();
             if (p.containsKey(k)) {
                 String s = p.get(k).toString();
@@ -218,6 +228,9 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
         }
         Rythm.Mode mode = devMode ? Rythm.Mode.dev : Rythm.Mode.prod;
         p.put(RythmConfigurationKey.ENGINE_MODE.getKey(), mode);
+
+        // Cache
+        p.put(RythmConfigurationKey.CACHE_ENABLED.getKey(), enableCache);
 
         // the i18 message resolver
         SpringI18nMessageResolver i18n = new SpringI18nMessageResolver();

@@ -15,6 +15,12 @@ import java.lang.annotation.Target;
  *
  * <p>If <code>rythm.cache.prodOnly</code> configuration is true,
  * then cache will not effect on dev mode</li>
+ *
+ * <p>Be sure not to use {@code CacheFor} on certain static page, such as
+ * an input form page. The reason is although form looks like the same
+ * every time to end user, however there might have content changes, say
+ * the csrf token, or at least do not use a very long expiration time
+ * when you really want to cache the form input page</p>
  * </ul>
  */
 @Retention(RetentionPolicy.RUNTIME)

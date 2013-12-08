@@ -18,6 +18,7 @@ import org.springframework.web.servlet.view.AbstractTemplateView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -90,12 +91,12 @@ public class RythmView extends AbstractTemplateView {
 
     protected RythmEngine autodetectRythmEngine() throws BeansException {
         try {
-            RythmConfig config = BeanFactoryUtils.beanOfTypeIncludingAncestors(
-                    getApplicationContext(), RythmConfig.class, true, false);
-            return config.getRythmEngine();
+            RythmHolder rythmHolder = BeanFactoryUtils.beanOfTypeIncludingAncestors(
+                    getApplicationContext(), RythmHolder.class, true, false);
+            return rythmHolder.getRythmEngine();
         } catch (NoSuchBeanDefinitionException ex) {
             throw new ApplicationContextException(
-                    "Must define a single RythmConfig bean in this web application context " +
+                    "Must define a single RythmHolder bean in this web application context " +
                             "(may be inherited): RythmConfigurer is the usual implementation. " +
                             "This bean may be given any name.", ex);
         }
@@ -161,20 +162,26 @@ public class RythmView extends AbstractTemplateView {
                 }
             }
             params.putAll(model);
-            params.put(underscoreImplicitVarNames ? "_rythm" : "rythm", engine);
-            if (!underscoreImplicitVarNames) {
-                params.put("_rythm", engine); // underscore rythm anyway
-            }
-            params.put(underscoreImplicitVarNames ? "_request" : "request", request);
-            params.put(underscoreImplicitVarNames ? "_response" : "response", response);
-            params.put(underscoreImplicitVarNames ? "_session" : "session", request.getSession());
+            boolean u = underscoreImplicitVarNames;
+            params.put(u ? "_request" : "request", request);
+            params.put(u ? "_response" : "response", response);
+            HttpSession httpSession = request.getSession();
+            params.put(u ? "_session" : "session", httpSession);
+
+            String csrfHeaderName = engine.getProperty(RythmConfigurer.CONF_CSRF_HEADER_NAME);
+            String csrfParamName = engine.getProperty(RythmConfigurer.CONF_CSRF_PARAM_NAME);
+            Csrf csrf = null != Session.current() ?
+                    new Csrf(csrfParamName, csrfHeaderName) :
+                    new Csrf(csrfParamName, csrfHeaderName, httpSession);
+            params.put(u ? "_csrf" : "csrf", csrf);
             renderArgs.set(params);
             t.__setRenderArgs(params);
             // TODO fix this: doesn't work when extends is taking place
             // t.render(response.getOutputStream());
             String s = t.render();
+            response.setCharacterEncoding("utf-8");
             IO.writeContent(s, response.getWriter());
-            CacheHandlerInterceptor.KeyAndTTL kt = CacheHandlerInterceptor.currentCacheKey();
+            CacheInterceptor.KeyAndTTL kt = CacheInterceptor.currentCacheKey();
             if (null != kt) {
                 engine.cache(kt.key, s, kt.ttl);
             }

@@ -9,6 +9,6 @@ import org.rythmengine.RythmEngine;
  * Time: 1:40 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface RythmConfig {
+public interface RythmHolder {
     RythmEngine getRythmEngine();
 }
