@@ -7,6 +7,7 @@ import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.ITemplateResourceLoader;
+import org.springframework.context.Phased;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -50,7 +51,7 @@ import java.util.*;
  * @see org.rythmengine.spring.web.RythmConfigurer
  * @see org.rythmengine.RythmEngine
  */
-public class RythmEngineFactory extends ApplicationObjectSupport {
+public class RythmEngineFactory extends ApplicationObjectSupport implements Phased {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -292,4 +293,8 @@ public class RythmEngineFactory extends ApplicationObjectSupport {
 			throws IOException, RythmException {
 	}
 
+    @Override
+    public int getPhase() {
+        return 0;
+    }
 }
