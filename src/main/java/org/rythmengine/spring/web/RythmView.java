@@ -164,6 +164,7 @@ public class RythmView extends AbstractTemplateView {
             params.putAll(model);
             boolean u = underscoreImplicitVarNames;
             params.put(u ? "_request" : "request", request);
+            params.put("__request", request);
             params.put(u ? "_response" : "response", response);
             HttpSession httpSession = request.getSession();
             params.put(u ? "_session" : "session", httpSession);

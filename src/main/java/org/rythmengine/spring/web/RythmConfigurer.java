@@ -18,12 +18,14 @@ import org.springframework.util.Assert;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.validation.Validator;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.*;
 
 import javax.servlet.ServletContext;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -193,13 +195,23 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     @Override
     protected void configRythm(Map<String, Object> config) {
-//        WebApplicationContext ctx = (WebApplicationContext)getApplicationContext();
-//        if (!config.containsKey(RythmConfigurationKey.HOME_TMP.getKey())) {
-//            File tmpdir = (File)ctx.getServletContext().getAttribute("javax.servlet.context.tempdir");
-//            if (null != tmpdir) {
-//                config.put(RythmConfigurationKey.HOME_TMP.getKey(), new File(tmpdir, "__rythm"));
-//            }
-//        }
+        WebApplicationContext ctx = (WebApplicationContext)getApplicationContext();
+        boolean allowFileWrite = true;
+        Object o = config.get(RythmConfigurationKey.ENGINE_FILE_WRITE_ENABLED.getKey());
+        if (null != o) {
+            allowFileWrite = Boolean.parseBoolean(String.valueOf(o));
+        }
+        if (allowFileWrite && !config.containsKey(RythmConfigurationKey.HOME_TMP.getKey())) {
+            File tmpdir = (File)ctx.getServletContext().getAttribute("javax.servlet.context.tempdir");
+            if (null != tmpdir) {
+                tmpdir = new File(tmpdir, "__rythm");
+                if (!tmpdir.exists()) {
+                    tmpdir.mkdirs();
+                }
+                config.put(RythmConfigurationKey.HOME_TMP.getKey(), tmpdir);
+            }
+        }
+
         config.put(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER.getKey(), new ISourceCodeEnhancer() {
             ImplicitVariables implicitVariables = new ImplicitVariables(underscoreImplicitVariableName);
 
@@ -211,7 +223,28 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
             @Override
             public String sourceCode() {
-                return "";
+                return "protected org.rythmengine.utils.RawData url(String path) {\n" +
+                        "if (path == null) path = \"/\";\n" +
+                        "if (!path.startsWith(\"//\") && !path.startsWith(\"http\")) {\n" +
+                        "\tpath = __request.getContextPath() + (path.startsWith(\"/\") ? \"\" : \"/\") + path; \n" +
+                        "}\n" +
+                        "return new org.rythmengine.utils.RawData(path);\n" +
+                        "}\n\n" +
+                        "protected org.rythmengine.utils.RawData fullUrl(String path) {\n" +
+                        "if (path == null) path = \"/\";\n" +
+                        "if (path.startsWith(\"//\") || path.startsWith(\"http\")) {\n" +
+                        "\treturn new org.rythmengine.utils.RawData(path);\n" +
+                        "}\n" +
+                        "if (!path.startsWith(\"/\")) {path = path + \"/\";}\n" +
+                        "String ctx = __request.getContextPath(); StringBuilder sb = new StringBuilder();\n" +
+                        "sb.append(__request.getScheme());\n" +
+                        "sb.append(\"://\");\n" +
+                        "sb.append(__request.getServerName()).append(\":\");\n" +
+                        "sb.append(__request.getServerPort()); \n" +
+                        "sb.append(ctx).append(path);\n" +
+                        "return new org.rythmengine.utils.RawData(sb);" +
+                        "}\n"
+                        ;
             }
 
             @Override

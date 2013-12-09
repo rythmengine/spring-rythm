@@ -3,6 +3,7 @@ package org.rythmengine.spring;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.extension.II18nMessageResolver;
 import org.rythmengine.template.ITemplate;
+import org.rythmengine.utils.S;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -30,6 +31,13 @@ public class SpringI18nMessageResolver implements II18nMessageResolver, Applicat
                 Object[] args0 = new Object[args.length - 1];
                 System.arraycopy(args, 1, args0, 0, args.length - 1);
                 args = args0;
+            }
+            for (int i = 0; i < args.length; ++i) {
+                Object arg = args[i];
+                if (arg instanceof String) {
+                    arg = S.i18n(template, (String) arg);
+                }
+                args[i] = arg;
             }
         }
         if (null == locale && null != template) {
