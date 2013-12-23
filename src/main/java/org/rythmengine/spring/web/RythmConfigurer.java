@@ -27,10 +27,7 @@ import org.springframework.web.servlet.config.annotation.*;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -91,6 +88,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private String csrfHeaderName = null;
 
+    private String autoImports = null;
+
     private static RythmConfigurer inst;
 
     public static RythmConfigurer getInstance() {
@@ -121,6 +120,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void setAutoCsrfCheck(boolean autoCsrfCheck) {
         this.autoCsrfCheck = autoCsrfCheck;
     }
+
+    public void setAutoImports(String autoImports) {this.autoImports = autoImports;}
 
     public void setEnableCacheFor(boolean enableCacheFor) {
         this.enableCacheFor = enableCacheFor;
@@ -218,6 +219,9 @@ public class RythmConfigurer extends RythmEngineFactory implements
             @Override
             public List<String> imports() {
                 List<String> l = new ArrayList<String>();
+                if (null != autoImports) {
+                    return Arrays.asList(autoImports.split("[, ;:]+"));
+                }
                 return l;
             }
 
