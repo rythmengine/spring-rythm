@@ -175,6 +175,9 @@ public class RythmEngineFactory extends ApplicationObjectSupport implements Phas
     }
 
 	protected boolean isDevMode() {
+	    if (null == devMode) {
+	        devMode = getDevModeSensor().isDevMode();
+	    }
 	    return this.devMode;
 	}
 

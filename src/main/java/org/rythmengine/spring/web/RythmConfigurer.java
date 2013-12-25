@@ -84,7 +84,9 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private boolean enableCacheFor = false;
 
-    private static String secretKey;
+    private static String secretKey = null;
+
+    private static SecretKeySensor secretKeySensor;
 
     private String csrfParamName = null;
 
@@ -137,6 +139,18 @@ public class RythmConfigurer extends RythmEngineFactory implements
         return enableSessionManager;
     }
 
+    public void setSecretKeySensor(String secretKeySensor) throws Exception {
+        Class<SecretKeySensor> c = (Class<SecretKeySensor>)Class.forName(secretKeySensor);
+        this.secretKeySensor = c.newInstance();
+    }
+
+    private SecretKeySensor getSecretKeySensor() {
+        if (null == secretKeySensor) {
+            secretKeySensor = new SecretKeySensor.DefaultSecretKeySensor(getApplicationContext());
+        }
+        return secretKeySensor;
+    }
+
     public void setSecretKey(String secretKey) {
         Assert.hasText(secretKey);
         int len = secretKey.length();
@@ -181,6 +195,9 @@ public class RythmConfigurer extends RythmEngineFactory implements
             engine = createRythmEngine();
         }
         inst = this;
+        if (null == secretKey) {
+            secretKey = getSecretKeySensor().getSecretKey();
+        }
     }
 
     @Override
@@ -332,12 +349,6 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if (autoCsrfCheck) {
-            CsrfManager csrfManager = new CsrfManager();
-            csrfManager.setParameterName(csrfParamName);
-            csrfManager.setHeaderName(csrfHeaderName);
-            registry.addInterceptor(csrfManager);
-        }
         if (enableSessionManager) {
             if (S.empty(secretKey)) {
                 throw new RuntimeException("No secure salt configured while session manager is enabled");
@@ -345,6 +356,12 @@ public class RythmConfigurer extends RythmEngineFactory implements
             SessionManager sm = new SessionManager();
             sm.setSessionExpire(sessionCookieExpire);
             registry.addInterceptor(sm);
+        }
+        if (autoCsrfCheck) {
+            CsrfManager csrfManager = new CsrfManager();
+            csrfManager.setParameterName(csrfParamName);
+            csrfManager.setHeaderName(csrfHeaderName);
+            registry.addInterceptor(csrfManager);
         }
         if (enableCacheFor && enableCache) {
             CacheInterceptor ci = new CacheInterceptor();
