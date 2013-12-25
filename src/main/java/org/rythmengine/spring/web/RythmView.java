@@ -44,6 +44,8 @@ public class RythmView extends AbstractTemplateView {
 
     private boolean underscoreImplicitVarNames = false;
 
+    private boolean enableSessionManager = false;
+
     public void setRythmEngine(RythmEngine engine) {
         this.engine = engine;
     }
@@ -77,6 +79,15 @@ public class RythmView extends AbstractTemplateView {
             } catch (Exception e) {
                 // ignore it
                 logger.warn("error set underscore implicit variable name config", e);
+            }
+        }
+        o = engine.getProperty(RythmConfigurer.CONF_ENABLE_SESSION_MANAGER);
+        if (null != o) {
+            try {
+                enableSessionManager = (Boolean) o;
+            } catch (Exception e) {
+                // ignore it
+                logger.warn("error set enable session manager config", e);
             }
         }
 
@@ -168,6 +179,9 @@ public class RythmView extends AbstractTemplateView {
             params.put(u ? "_response" : "response", response);
             HttpSession httpSession = request.getSession();
             params.put(u ? "_session" : "session", httpSession);
+            if (enableSessionManager) {
+                params.put(u ? "_session2" : "session2", Session.current());
+            }
 
             String csrfHeaderName = engine.getProperty(RythmConfigurer.CONF_CSRF_HEADER_NAME);
             String csrfParamName = engine.getProperty(RythmConfigurer.CONF_CSRF_PARAM_NAME);

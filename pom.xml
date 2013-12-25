@@ -14,7 +14,8 @@
   ~ License for the specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -40,7 +41,7 @@
             <url>http://repo.springsource.org/release</url>
         </repository>
     </repositories>
-    
+
     <scm>
         <connection>scm:git:git://github.com/greenlaw110/spring-rythm.git</connection>
         <developerConnection>scm:git:git@github.com:greenlaw110/spring-rythm.git</developerConnection>
@@ -174,7 +175,7 @@
                         <version>2.9</version>
                         <configuration>
                             <stylesheetfile>src/etc/javadoc.css</stylesheetfile>
-                            <quiet />
+                            <quiet/>
                         </configuration>
                         <executions>
                             <execution>
