@@ -178,7 +178,7 @@ public class RythmView extends AbstractTemplateView {
             params.put(u ? "_request" : "request", request);
             params.put("__request", request);
             params.put(u ? "_response" : "response", response);
-            HttpSession httpSession = request.getSession();
+            HttpSession httpSession = request.getSession(false);
             params.put(u ? "_httpSession" : "httpSession", httpSession);
             if (enableSessionManager) {
                 params.put(u ? "_session" : "session", Session.current());
@@ -188,7 +188,7 @@ public class RythmView extends AbstractTemplateView {
             String csrfParamName = engine.getProperty(RythmConfigurer.CONF_CSRF_PARAM_NAME);
             Csrf csrf = null != Session.current() ?
                     new Csrf(csrfParamName, csrfHeaderName) :
-                    new Csrf(csrfParamName, csrfHeaderName, httpSession);
+                    new Csrf(csrfParamName, csrfHeaderName, request.getSession());
             params.put(u ? "_csrf" : "csrf", csrf);
             renderArgs.set(params);
             t.__setRenderArgs(params);
