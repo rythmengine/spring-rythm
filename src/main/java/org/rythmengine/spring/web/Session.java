@@ -108,6 +108,26 @@ public class Session {
         }
     }
 
+    private String sessionedKey(String key) {
+        return String.format("%s-%s", key, getId());
+    }
+
+    public void cache(String key, Object val) {
+        Cache.put(sessionedKey(key), val);
+    }
+
+    public void cache(String key, Object val, String expiration) {
+        Cache.put(sessionedKey(key), val, expiration);
+    }
+
+    public <T> T cached(String key) {
+        return (T) Cache.get(sessionedKey(key));
+    }
+
+    public <T> T cached(String key, Class<T> clz) {
+        return (T) Cache.get(sessionedKey(key));
+    }
+
     public void clear() {
         change();
         data.clear();
