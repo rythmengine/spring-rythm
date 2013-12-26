@@ -147,6 +147,7 @@ public class RythmView extends AbstractTemplateView {
         RythmEngine engine = this.engine;
         if (null != re) {
             checkResource(null);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             engine.render(response.getOutputStream(), "errors/500.html", re);
             return;
         }
@@ -178,9 +179,9 @@ public class RythmView extends AbstractTemplateView {
             params.put("__request", request);
             params.put(u ? "_response" : "response", response);
             HttpSession httpSession = request.getSession();
-            params.put(u ? "_session" : "session", httpSession);
+            params.put(u ? "_httpSession" : "httpSession", httpSession);
             if (enableSessionManager) {
-                params.put(u ? "_session2" : "session2", Session.current());
+                params.put(u ? "_session" : "session", Session.current());
             }
 
             String csrfHeaderName = engine.getProperty(RythmConfigurer.CONF_CSRF_HEADER_NAME);
@@ -201,6 +202,7 @@ public class RythmView extends AbstractTemplateView {
                 engine.cache(kt.key, s, kt.ttl);
             }
         } catch (RythmException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             engine.render(response.getOutputStream(), "errors/500.html", e);
         } finally {
             renderArgs.remove();

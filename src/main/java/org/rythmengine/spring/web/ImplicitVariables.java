@@ -44,8 +44,8 @@ class ImplicitVariables {
         Var[] vars = {
                 new Var("request", HttpServletRequest.class.getName(), underscoreImplicitVariableName),
                 new Var("response", HttpServletResponse.class.getName(), underscoreImplicitVariableName),
-                new Var("session", HttpSession.class.getName(), underscoreImplicitVariableName),
-                new Var("session2", Session.class.getName(), underscoreImplicitVariableName),
+                new Var("httpSession", HttpSession.class.getName(), underscoreImplicitVariableName),
+                new Var("session", Session.class.getName(), underscoreImplicitVariableName),
                 new Var("csrf", Csrf.class.getName(), underscoreImplicitVariableName),
                 new Var("__request", HttpServletRequest.class.getName(), false),
         };

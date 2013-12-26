@@ -43,6 +43,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        req.set(request);
         Cookie[] cookies = request.getCookies();
         Map<String, Cookie> m = new HashMap<String, Cookie>();
         boolean sessionResolved = false;

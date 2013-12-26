@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,10 +27,11 @@ public class RythmExceptionHandler {
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ModelAndView defaultErrorHandler(Exception e) throws Exception {
+    public ModelAndView defaultErrorHandler(Exception e, HttpServletResponse response) throws Exception {
         if (engine.isProdMode()) {
             throw e;
         }
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         ModelAndView mav = new ModelAndView();
         mav.addObject("exception", e);
         mav.setViewName("errors/500.html");
