@@ -32,7 +32,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     static final String TS_KEY = "___TS";
 
     private String cookieName = DEFAULT_COOKIE_PREFIX + "_SESSION";
-    private int ttl = -1;
+    private static int ttl = -1;
     void setSessionPrefix(String prefix) {
         this.cookieName = prefix + "_SESSION";
     }
@@ -186,7 +186,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         return req.get().getSession(false);
     }
 
-    public void setCookie(String name, String value) {
+    public static void setCookie(String name, String value) {
         setCookie(name, value, null, "/", ttl, false);
     }
 
