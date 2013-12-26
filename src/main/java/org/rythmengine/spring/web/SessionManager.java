@@ -47,14 +47,16 @@ public class SessionManager extends HandlerInterceptorAdapter {
         Cookie[] cookies = request.getCookies();
         Map<String, Cookie> m = new HashMap<String, Cookie>();
         boolean sessionResolved = false;
-        for (Cookie c : cookies) {
-            String nm = c.getName();
-            m.put(nm, c);
-            if (!sessionResolved && S.eq(cookieName, nm)) {
-                // pick up only the first cookie with the name COOKIE_PREFIX + "_SESSION"
-                // see http://stackoverflow.com/questions/4056306/how-to-handle-multiple-cookies-with-the-same-name
-                resolveSession(c);
-                sessionResolved = true;
+        if (null != cookies) {
+            for (Cookie c : cookies) {
+                String nm = c.getName();
+                m.put(nm, c);
+                if (!sessionResolved && S.eq(cookieName, nm)) {
+                    // pick up only the first cookie with the name COOKIE_PREFIX + "_SESSION"
+                    // see http://stackoverflow.com/questions/4056306/how-to-handle-multiple-cookies-with-the-same-name
+                    resolveSession(c);
+                    sessionResolved = true;
+                }
             }
         }
         if (!sessionResolved) {
