@@ -182,6 +182,7 @@ public class RythmView extends AbstractTemplateView {
             params.put(u ? "_httpSession" : "httpSession", httpSession);
             if (enableSessionManager) {
                 params.put(u ? "_session" : "session", Session.current());
+                params.put(u ? "_flash" : "flash", Flash.current());
             }
 
             String csrfHeaderName = engine.getProperty(RythmConfigurer.CONF_CSRF_HEADER_NAME);

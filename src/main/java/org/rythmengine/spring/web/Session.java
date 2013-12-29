@@ -120,6 +120,30 @@ public class Session {
         Cache.put(sessionedKey(key), val, expiration);
     }
 
+    public void cacheFor1Hr(String key, Object val) {
+        Cache.put(sessionedKey(key), val, "1hr");
+    }
+
+    public void cacheFor30Min(String key, Object val) {
+        Cache.put(sessionedKey(key), val, "30mn");
+    }
+
+    public void cacheFor10Min(String key, Object val) {
+        Cache.put(sessionedKey(key), val, "10mn");
+    }
+
+    public void cacheFor5Min(String key, Object val) {
+        Cache.put(sessionedKey(key), val, "5mn");
+    }
+
+    public void cacheFor1Min(String key, Object val) {
+        Cache.put(sessionedKey(key), val, "1mn");
+    }
+
+    public void evict(String key) {
+        Cache.delete(key);
+    }
+
     public <T> T cached(String key) {
         return (T) Cache.get(sessionedKey(key));
     }
