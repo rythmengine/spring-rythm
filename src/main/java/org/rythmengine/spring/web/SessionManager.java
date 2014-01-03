@@ -1,6 +1,6 @@
 package org.rythmengine.spring.web;
 
-import org.rythmengine.spring.utils.Crypto;
+import org.osgl.util.Crypto;
 import org.rythmengine.utils.S;
 import org.rythmengine.utils.Time;
 import org.springframework.web.servlet.ModelAndView;
@@ -46,6 +46,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         req.set(request);
+        resp.set(response);
         Cookie[] cookies = request.getCookies();
         Map<String, Cookie> m = new HashMap<String, Cookie>();
         Cookie sessionCookie = null;
@@ -229,10 +230,11 @@ public class SessionManager extends HandlerInterceptorAdapter {
     }
 
     public static String sign(String s) {
-        return Crypto.sign(s);
+        return Crypto.sign(s, RythmConfigurer.getSecretKey().getBytes());
     }
 
     private static ThreadLocal<HttpServletRequest> req = new ThreadLocal<HttpServletRequest>();
+    private static ThreadLocal<HttpServletResponse> resp = new ThreadLocal<HttpServletResponse>();
     private static ThreadLocal<Session> sess = new ThreadLocal<Session>();
     private static ThreadLocal<Flash> fla = new ThreadLocal<Flash>();
     private static ThreadLocal<Map<String, Cookie>> cookie = new ThreadLocal<Map<String, Cookie>>();
@@ -243,6 +245,10 @@ public class SessionManager extends HandlerInterceptorAdapter {
 
     public static HttpServletRequest request() {
         return req.get();
+    }
+
+    public static HttpServletResponse response() {
+        return resp.get();
     }
 
     public static HttpSession httpSession() {
