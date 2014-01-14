@@ -1,5 +1,7 @@
 package org.rythmengine.spring.web;
 
+import org.osgl.web.util.UserAgent;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -46,6 +48,7 @@ class ImplicitVariables {
                 new Var("response", HttpServletResponse.class.getName(), underscoreImplicitVariableName),
                 new Var("httpSession", HttpSession.class.getName(), underscoreImplicitVariableName),
                 new Var("session", Session.class.getName(), underscoreImplicitVariableName),
+                new Var("userAgent", UserAgent.class.getName(), underscoreImplicitVariableName),
                 new Var("flash", Flash.class.getName(), underscoreImplicitVariableName),
                 new Var("csrf", Csrf.class.getName(), underscoreImplicitVariableName),
                 new Var("__request", HttpServletRequest.class.getName(), false),

@@ -62,6 +62,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     public static final String CONF_ENABLE_SESSION_MANAGER = "enableSessionManager";
 
+    public static final String CONF_ENABLE_USER_AGENT_DETECTOR = "enableUserAgentDetector";
+
     public static final String CONF_CSRF_PARAM_NAME = "csrfParameterName";
 
     public static final String CONF_CSRF_HEADER_NAME = "csrfHeaderName";
@@ -138,7 +140,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     }
 
     public void setEnableUserAgentDetector(boolean enableUserAgentDetector) {
-        this.enableSessionManager = enableUserAgentDetector;
+        this.enableUserAgentDetector = enableUserAgentDetector;
     }
 
     public boolean sessionManagerEnabled() {
@@ -304,6 +306,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
         engine.setProperty(CONF_OUTOUT_REQ_PARAMS, outputRequestParameters);
         engine.setProperty(CONF_UNDERSCORE_IMPLICIT_VAR_NAME, underscoreImplicitVariableName);
         engine.setProperty(CONF_ENABLE_SESSION_MANAGER, enableSessionManager);
+        engine.setProperty(CONF_ENABLE_USER_AGENT_DETECTOR, enableUserAgentDetector);
         if (null != csrfHeaderName) engine.setProperty(CONF_CSRF_HEADER_NAME, csrfHeaderName);
         if (null != csrfParamName) engine.setProperty(CONF_CSRF_PARAM_NAME, csrfParamName);
     }

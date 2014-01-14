@@ -28,6 +28,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
 
     public static interface Listener {
         void onSessionResolved(Session session);
+        void onSessionCleanUp();
 
         public static abstract class Base implements Listener, InitializingBean {
             @Override
@@ -118,6 +119,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         req.remove();
         fla.remove();
         cookie.remove();
+        listeners.accept(F.ON_SESSION_CLEAN_UP);
     }
 
     private void resolveSession(Cookie cookie) throws Exception {
@@ -322,5 +324,11 @@ public class SessionManager extends HandlerInterceptorAdapter {
                 }
             };
         }
+        public static _.Visitor<Listener> ON_SESSION_CLEAN_UP = new _.Visitor<Listener>() {
+            @Override
+            public void visit(Listener listener) throws _.Break {
+                listener.onSessionCleanUp();
+            }
+        };
     }
 }

@@ -46,6 +46,8 @@ public class RythmView extends AbstractTemplateView {
 
     private boolean enableSessionManager = false;
 
+    private boolean enableUserAgentDetector = false;
+
     public void setRythmEngine(RythmEngine engine) {
         this.engine = engine;
     }
@@ -88,6 +90,15 @@ public class RythmView extends AbstractTemplateView {
             } catch (Exception e) {
                 // ignore it
                 logger.warn("error set enable session manager config", e);
+            }
+        }
+
+        o = engine.getProperty(RythmConfigurer.CONF_ENABLE_USER_AGENT_DETECTOR);
+        if (null != o) {
+            try {
+                enableUserAgentDetector = (Boolean)o;
+            } catch (Exception e) {
+                logger.warn("error set enable user agent detector config", e);
             }
         }
 
@@ -183,6 +194,9 @@ public class RythmView extends AbstractTemplateView {
             if (enableSessionManager) {
                 params.put(u ? "_session" : "session", Session.current());
                 params.put(u ? "_flash" : "flash", Flash.current());
+            }
+            if (enableUserAgentDetector) {
+                params.put(u ? "_userAgent" : "userAgent", UADetector.get());
             }
 
             String csrfHeaderName = engine.getProperty(RythmConfigurer.CONF_CSRF_HEADER_NAME);
