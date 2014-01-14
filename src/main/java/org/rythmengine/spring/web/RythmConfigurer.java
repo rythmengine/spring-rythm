@@ -82,6 +82,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private boolean enableSessionManager = false;
 
+    private boolean enableUserAgentDetector = false;
+
     private boolean enableCacheFor = false;
 
     private static String secretKey = null;
@@ -133,6 +135,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     public void setEnableSessionManager(boolean enableSessionManager) {
         this.enableSessionManager = enableSessionManager;
+    }
+
+    public void setEnableUserAgentDetector(boolean enableUserAgentDetector) {
+        this.enableSessionManager = enableUserAgentDetector;
     }
 
     public boolean sessionManagerEnabled() {
@@ -367,6 +373,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
             CacheInterceptor ci = new CacheInterceptor();
             ci.setEngine(engine);
             registry.addInterceptor(ci);
+        }
+        if (enableUserAgentDetector) {
+            UADetector ua = new UADetector();
+            registry.addInterceptor(ua);
         }
     }
 
