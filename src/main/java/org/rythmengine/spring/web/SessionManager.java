@@ -1,8 +1,11 @@
 package org.rythmengine.spring.web;
 
+import org.osgl._;
+import org.osgl.util.C;
 import org.osgl.util.Crypto;
 import org.rythmengine.utils.S;
 import org.rythmengine.utils.Time;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -23,6 +26,17 @@ import java.util.regex.Pattern;
  */
 public class SessionManager extends HandlerInterceptorAdapter {
 
+    public static interface Listener {
+        void onSessionResolved(Session session);
+
+        public static abstract class Base implements Listener, InitializingBean {
+            @Override
+            public void afterPropertiesSet() throws Exception {
+                SessionManager.addListener(this);
+            }
+        }
+    }
+
     public static final String DEFAULT_COOKIE_PREFIX = "WHLAB";
     public static final int DEFAULT_COOKIE_EXPIRE = 60 * 60 * 24 * 30;
 
@@ -35,6 +49,12 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private String sessionCookieName = DEFAULT_COOKIE_PREFIX + "_SESSION";
     private String flashCookieName = DEFAULT_COOKIE_PREFIX + "_FLASH";
     private static int ttl = -1;
+    private static final C.List<Listener> listeners = C.newList();
+
+    public static void addListener(Listener listener) {
+        listeners.add(listener);
+    }
+
     void setSessionPrefix(String prefix) {
         this.sessionCookieName = prefix + "_SESSION";
     }
@@ -136,6 +156,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
             }
         }
         sess.set(session);
+        listeners.accept(F.onSessionResolved(session));
     }
 
     private void createSessionCookie(String value) {
@@ -291,4 +312,15 @@ public class SessionManager extends HandlerInterceptorAdapter {
         return map.containsKey(name);
     }
 
+    public static enum F {
+        ;
+        public static _.Visitor<Listener> onSessionResolved(final Session session) {
+            return new _.Visitor<Listener>() {
+                @Override
+                public void visit(Listener listener) throws _.Break {
+                    listener.onSessionResolved(session);
+                }
+            };
+        }
+    }
 }
