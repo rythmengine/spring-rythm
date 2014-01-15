@@ -7,6 +7,7 @@ import org.rythmengine.utils.S;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.NoSuchMessageException;
 
 import java.util.Locale;
 
@@ -43,7 +44,11 @@ public class SpringI18nMessageResolver implements II18nMessageResolver, Applicat
         if (null == locale && null != template) {
             locale = null == template ? RythmEngine.get().renderSettings.locale() : template.__curLocale();
         }
-        return msgSrc.getMessage(key, args, locale);
+        try {
+            return msgSrc.getMessage(key, args, locale);
+        } catch (NoSuchMessageException e) {
+            return key;
+        }
     }
 
     @Override
