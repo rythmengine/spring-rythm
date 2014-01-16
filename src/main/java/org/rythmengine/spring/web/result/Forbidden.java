@@ -5,17 +5,17 @@ import org.springframework.http.HttpStatus;
 /**
  * Created by luog on 30/12/13.
  */
-public class NotFound extends Result {
+public class Forbidden extends Result {
 
     /**
      * @param why a description of the problem
      */
-    public NotFound(String why) {
-        super(HttpStatus.NOT_FOUND, why);
+    public Forbidden(String why) {
+        super(HttpStatus.FORBIDDEN, why);
     }
 
-    public NotFound() {
-        super(HttpStatus.NOT_FOUND);
+    public Forbidden() {
+        super(HttpStatus.FORBIDDEN);
     }
 
 }

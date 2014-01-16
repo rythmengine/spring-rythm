@@ -1,4 +1,4 @@
-package org.rythmengine.spring.utils;
+package org.rythmengine.spring.util;
 
 import org.rythmengine.RythmEngine;
 import org.rythmengine.spring.web.RythmConfigurer;

@@ -1,4 +1,4 @@
-package org.rythmengine.spring.web.utils;
+package org.rythmengine.spring.web.util;
 
 import org.rythmengine.spring.web.RythmConfigurer;
 import org.springframework.web.context.WebApplicationContext;

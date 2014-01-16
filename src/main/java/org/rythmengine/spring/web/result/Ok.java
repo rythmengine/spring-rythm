@@ -1,22 +1,27 @@
 package org.rythmengine.spring.web.result;
 
-import org.rythmengine.exception.FastRuntimeException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by luog on 30/12/13.
  */
-@ResponseStatus(HttpStatus.OK)
-public class Ok extends FastRuntimeException {
+public class Ok extends Result {
 
     /**
      * @param why a description of the problem
      */
     public Ok(String why) {
-        super(why);
+        super(HttpStatus.OK, why);
     }
 
-    public Ok() {}
+    public Ok() {
+        super(HttpStatus.OK);
+    }
 
+    @Override
+    protected void writeToResponse(HttpServletResponse response, int statusCode, String message) {
+        // do nothing for 200 Okay
+    }
 }

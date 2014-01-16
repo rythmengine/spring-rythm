@@ -1,6 +1,7 @@
 package org.rythmengine.spring.web;
 
 import org.rythmengine.RythmEngine;
+import org.rythmengine.spring.web.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,8 +31,11 @@ import java.util.List;
 @EnableWebMvc
 public class RythmExceptionHandler implements MessageSourceAware {
 
-    private MessageSource messageSource;
+    private static MessageSource messageSource;
 
+    public static MessageSource getMessageSource() {
+        return messageSource;
+    }
 
     public void setMessageSource(MessageSource messageSource) {
         this.messageSource = messageSource;
@@ -45,8 +50,11 @@ public class RythmExceptionHandler implements MessageSourceAware {
 
     @ExceptionHandler(value = Exception.class)
     public ModelAndView defaultErrorHandler(Exception e, HttpServletResponse response) throws Exception {
-        if (engine.isProdMode() || e instanceof ServletException) {
-            throw e;
+        if (e instanceof Result) {
+            Result r = (Result)e;
+            HttpServletRequest request = SessionManager.request();
+            r.apply(request, response);
+            return new ModelAndView();
         }
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class);
         if (null != responseStatus) {
@@ -61,6 +69,9 @@ public class RythmExceptionHandler implements MessageSourceAware {
                 response.sendError(statusCode, reason);
             }
             return new ModelAndView();
+        }
+        if (engine.isProdMode() || e instanceof ServletException) {
+            throw e;
         }
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         ModelAndView mav = new ModelAndView();

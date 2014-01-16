@@ -1,12 +1,72 @@
 package org.rythmengine.spring.web;
 
+import org.osgl.util.S;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by luog on 30/12/13.
  */
 public enum HttpFormat {
-    html, xml, json, xls, xlsx, doc, docx, csv, txt;
+    html {
+        @Override
+        public String toContentType() {
+            return "text/html";
+        }
+    },
+    xml {
+        @Override
+        public String toContentType() {
+            return "text/xml";
+        }
+    },
+    json {
+        @Override
+        public String toContentType() {
+            return "application/json";
+        }
+
+        @Override
+        public String errorMessage(String message) {
+            return S.fmt("{\"error\": \"%s\"}", message);
+        }
+    },
+    xls {
+        @Override
+        public String toContentType() {
+            return "application/vnd.ms-excel";
+        }
+    },
+    xlsx {
+        @Override
+        public String toContentType() {
+            return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        }
+    },
+    doc {
+        @Override
+        public String toContentType() {
+            return "application/vnd.ms-word";
+        }
+    },
+    docx {
+        @Override
+        public String toContentType() {
+            return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        }
+    },
+    csv {
+        @Override
+        public String toContentType() {
+            return "text/csv";
+        }
+    },
+    txt {
+        @Override
+        public String toContentType() {
+            return "text/plain";
+        }
+    };
 
     public static final String ATTR_FORMAT = "__fmt";
 
@@ -41,5 +101,11 @@ public enum HttpFormat {
 
         request.setAttribute(ATTR_FORMAT, fmt);
         return fmt;
+    }
+
+    public abstract String toContentType();
+
+    public String errorMessage(String message) {
+        return message;
     }
 }

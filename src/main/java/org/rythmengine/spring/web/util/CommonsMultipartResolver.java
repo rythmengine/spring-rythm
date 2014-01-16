@@ -1,5 +1,7 @@
-package org.rythmengine.spring.web.utils;
+package org.rythmengine.spring.web.util;
 
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.osgl.util.S;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Created by luog on 3/01/14.
  */
-public class StandardServletMultipartResolver extends org.springframework.web.multipart.support.StandardServletMultipartResolver {
+public class CommonsMultipartResolver extends org.springframework.web.multipart.commons.CommonsMultipartResolver {
     @Override
     public boolean isMultipart(HttpServletRequest request) {
         // support HTTP PUT operation
@@ -15,7 +17,6 @@ public class StandardServletMultipartResolver extends org.springframework.web.mu
         if (S.neq("post", method) && S.neq("put", method)) {
             return false;
         }
-        String contentType = request.getContentType();
-        return (contentType != null && contentType.toLowerCase().startsWith("multipart/"));
+        return FileUploadBase.isMultipartContent(new ServletRequestContext(request));
     }
 }

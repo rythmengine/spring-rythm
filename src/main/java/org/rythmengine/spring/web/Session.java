@@ -1,6 +1,6 @@
 package org.rythmengine.spring.web;
 
-import org.rythmengine.spring.utils.Cache;
+import org.rythmengine.spring.util.Cache;
 import org.rythmengine.utils.S;
 
 import java.util.HashMap;
