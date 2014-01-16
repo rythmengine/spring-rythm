@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,15 +25,16 @@ import java.util.List;
  * Created by luog on 4/12/13.
  */
 @ControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE)
 @EnableWebMvc
 public class RythmExceptionHandler implements MessageSourceAware {
 
     private MessageSource messageSource;
 
 
-   	public void setMessageSource(MessageSource messageSource) {
-   		this.messageSource = messageSource;
-   	}
+    public void setMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     RythmEngine engine;
 
@@ -48,17 +51,16 @@ public class RythmExceptionHandler implements MessageSourceAware {
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class);
         if (null != responseStatus) {
             int statusCode = responseStatus.value().value();
-          		String reason = responseStatus.reason();
-          		if (this.messageSource != null) {
-          			reason = this.messageSource.getMessage(reason, null, reason, LocaleContextHolder.getLocale());
-          		}
-          		if (!StringUtils.hasLength(reason)) {
-          			response.sendError(statusCode);
-          		}
-          		else {
-          			response.sendError(statusCode, reason);
-          		}
-          		return new ModelAndView();
+            String reason = responseStatus.reason();
+            if (this.messageSource != null) {
+                reason = this.messageSource.getMessage(reason, null, reason, LocaleContextHolder.getLocale());
+            }
+            if (!StringUtils.hasLength(reason)) {
+                response.sendError(statusCode);
+            } else {
+                response.sendError(statusCode, reason);
+            }
+            return new ModelAndView();
         }
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         ModelAndView mav = new ModelAndView();
