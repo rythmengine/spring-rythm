@@ -47,8 +47,8 @@ public class SessionManager extends HandlerInterceptorAdapter {
     static final String ID_KEY = Session.ID_KEY;
     static final String TS_KEY = Session.TS_KEY;
 
-    private String sessionCookieName = DEFAULT_COOKIE_PREFIX + "_SESSION";
-    private String flashCookieName = DEFAULT_COOKIE_PREFIX + "_FLASH";
+    private static String sessionCookieName = DEFAULT_COOKIE_PREFIX + "_SESSION";
+    private static String flashCookieName = DEFAULT_COOKIE_PREFIX + "_FLASH";
     private static int ttl = -1;
     private static final C.List<Listener> listeners = C.newList();
 
@@ -161,7 +161,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         listeners.accept(F.onSessionResolved(session));
     }
 
-    private void createSessionCookie(String value) {
+    private static void createSessionCookie(String value) {
         Cookie cookie = new Cookie(sessionCookieName, value);
         cookie.setPath("/");
         if (ttl > -1) {
@@ -170,7 +170,12 @@ public class SessionManager extends HandlerInterceptorAdapter {
         SessionManager.cookie.get().put(sessionCookieName, cookie);
     }
 
-    private void saveSession() {
+    static void _save() {
+        saveSession();
+        saveFlash();
+    }
+
+    private static void saveSession() {
         Session session = session();
         if (null == session) {
             return;
@@ -217,7 +222,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         fla.set(flash);
     }
 
-    private void createFlashCookie(String value) {
+    private static void createFlashCookie(String value) {
         Cookie cookie = new Cookie(sessionCookieName, value);
         cookie.setPath("/");
         if (ttl > -1) {
@@ -226,7 +231,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         SessionManager.cookie.get().put(sessionCookieName, cookie);
     }
 
-    private void saveFlash() {
+    private static void saveFlash() {
         Flash flash = flash();
         if (null == flash) {
             return;
