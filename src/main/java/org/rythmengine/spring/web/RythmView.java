@@ -205,7 +205,7 @@ public class RythmView extends AbstractTemplateView {
                     new Csrf(csrfParamName, csrfHeaderName) :
                     new Csrf(csrfParamName, csrfHeaderName, request.getSession());
             params.put(u ? "_csrf" : "csrf", csrf);
-            renderArgs.set(params);
+            //renderArgs.set(params);
             t.__setRenderArgs(params);
             // TODO fix this: doesn't work when extends is taking place
             // t.render(response.getOutputStream());
@@ -220,7 +220,7 @@ public class RythmView extends AbstractTemplateView {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             engine.render(response.getOutputStream(), "errors/500.html", e);
         } finally {
-            renderArgs.remove();
+            //renderArgs.remove();
         }
     }
 }

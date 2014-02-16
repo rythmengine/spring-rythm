@@ -1,5 +1,6 @@
 package org.rythmengine.spring.web;
 
+import org.osgl.util.E;
 import org.osgl.web.util.UserAgent;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,9 +34,10 @@ class ImplicitVariables {
         }
 
         protected Object evaluate() {
-            Map<String, Object> renderArgs = RythmView.renderArgs.get();
-            if (null == renderArgs) return null;
-            return renderArgs.get(name());
+            throw E.unsupport();
+//            Map<String, Object> renderArgs = RythmView.renderArgs.get();
+//            if (null == renderArgs) return null;
+//            return renderArgs.get(name());
         }
     }
 

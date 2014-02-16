@@ -289,11 +289,12 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
             @Override
             public void setRenderArgs(ITemplate template) {
-                Map<String, Object> m = new HashMap<String, Object>();
-                for (ImplicitVariables.Var var : implicitVariables.vars) {
-                    m.put(var.name(), var.evaluate());
-                }
-                template.__setRenderArgs(m);
+                // already set in RythmView
+//                Map<String, Object> m = new HashMap<String, Object>();
+//                for (ImplicitVariables.Var var : implicitVariables.vars) {
+//                    m.put(var.name(), var.evaluate());
+//                }
+//                template.__setRenderArgs(m);
             }
         });
     }
