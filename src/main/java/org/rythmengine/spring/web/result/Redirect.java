@@ -3,6 +3,7 @@ package org.rythmengine.spring.web.result;
 import org.osgl.util.E;
 import org.osgl.util.S;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,7 +22,8 @@ public class Redirect extends Result {
     }
 
     @Override
-    protected void writeToResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
-        response.sendRedirect(getMessage());
+    protected ModelAndView writeToResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
+        //response.sendRedirect(getMessage());
+        return new ModelAndView("redirect:" + getMessage());
     }
 }

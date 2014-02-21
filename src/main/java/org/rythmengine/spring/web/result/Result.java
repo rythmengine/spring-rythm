@@ -8,6 +8,7 @@ import org.rythmengine.utils.S;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,7 +47,7 @@ public class Result extends FastRuntimeException {
         this.status = status;
     }
 
-    public void apply(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView apply(HttpServletRequest request, HttpServletResponse response) {
         int statusCode = status.value();
         String reason = getMessage();
 
@@ -61,14 +62,15 @@ public class Result extends FastRuntimeException {
         response.setContentType(contentType);
 
         try {
-            writeToResponse(response, statusCode, reason);
+            return writeToResponse(response, statusCode, reason);
         } catch (IOException e) {
             throw E.ioException(e);
         }
     }
 
-    protected void writeToResponse(HttpServletResponse response, int statusCode,  String message) throws IOException {
+    protected ModelAndView writeToResponse(HttpServletResponse response, int statusCode,  String message) throws IOException {
         response.sendError(statusCode, message);
+        return new ModelAndView();
     }
 
 }

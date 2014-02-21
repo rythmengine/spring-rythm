@@ -365,6 +365,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
             }
             SessionManager sm = new SessionManager();
             sm.setSessionExpire(sessionCookieExpire);
+            sm.setSessionPrefix(sessionCookiePrefix);
             registry.addInterceptor(sm);
         }
         if (autoCsrfCheck) {

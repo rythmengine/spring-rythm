@@ -54,8 +54,7 @@ public class RythmExceptionHandler implements MessageSourceAware {
             Result r = (Result)e;
             SessionManager._save();
             HttpServletRequest request = SessionManager.request();
-            r.apply(request, response);
-            return new ModelAndView();
+            return r.apply(request, response);
         }
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class);
         if (null != responseStatus) {

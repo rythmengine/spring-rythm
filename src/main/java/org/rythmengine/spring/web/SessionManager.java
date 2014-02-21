@@ -57,7 +57,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     }
 
     void setSessionPrefix(String prefix) {
-        this.sessionCookieName = prefix + "_SESSION";
+        if (null != prefix) this.sessionCookieName = prefix + "_SESSION";
     }
 
     void setSessionExpire(String expire) {

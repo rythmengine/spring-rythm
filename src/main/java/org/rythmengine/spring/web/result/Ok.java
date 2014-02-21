@@ -1,6 +1,7 @@
 package org.rythmengine.spring.web.result;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,7 +22,8 @@ public class Ok extends Result {
     }
 
     @Override
-    protected void writeToResponse(HttpServletResponse response, int statusCode, String message) {
+    protected ModelAndView writeToResponse(HttpServletResponse response, int statusCode, String message) {
         // do nothing for 200 Okay
+        return new ModelAndView();
     }
 }
