@@ -1,8 +1,8 @@
 package org.rythmengine.spring;
 
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.rythmengine.extension.ITemplateResourceLoader;
-import org.rythmengine.logger.ILogger;
-import org.rythmengine.logger.Logger;
 import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.resource.TemplateResourceBase;
 import org.rythmengine.utils.IO;
@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 class SpringTemplateResource extends TemplateResourceBase implements ITemplateResource {
 
-    ILogger logger = Logger.get(ITemplateResource.class);
+    Logger logger = L.get(ITemplateResource.class);
 
     private Resource springResource = null;
     private String key;

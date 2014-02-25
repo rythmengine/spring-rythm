@@ -1,11 +1,11 @@
 package org.rythmengine.spring.util;
 
 import org.osgl._;
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.osgl.util.C;
 import org.osgl.util.E;
 import org.rythmengine.RythmEngine;
-import org.rythmengine.logger.ILogger;
-import org.rythmengine.logger.Logger;
 import org.rythmengine.spring.web.*;
 import org.rythmengine.utils.S;
 import org.springframework.beans.factory.InitializingBean;
@@ -21,7 +21,7 @@ import javax.servlet.http.HttpSession;
  */
 public class MailerBase implements InitializingBean {
 
-    static ILogger logger = Logger.get(MailerBase.class);
+    static Logger logger = L.get(MailerBase.class);
 
     private static RythmEngine engine;
 
@@ -47,7 +47,7 @@ public class MailerBase implements InitializingBean {
                     underscoreImplicitVarNames = (Boolean) o;
                 } catch (Exception e) {
                     // ignore it
-                    logger.warn("error set underscore implicit variable name config", e);
+                    logger.warn(e, "error set underscore implicit variable name config");
                 }
             }
             o = engine.getProperty(RythmConfigurer.CONF_ENABLE_SESSION_MANAGER);
@@ -56,7 +56,7 @@ public class MailerBase implements InitializingBean {
                     enableSessionManager = (Boolean) o;
                 } catch (Exception e) {
                     // ignore it
-                    logger.warn("error set enable session manager config", e);
+                    logger.warn(e, "error set enable session manager config");
                 }
             }
             o = engine.getProperty(RythmConfigurer.CONF_ENABLE_USER_AGENT_DETECTOR);
@@ -64,7 +64,7 @@ public class MailerBase implements InitializingBean {
                 try {
                     enableUserAgentDetector = (Boolean)o;
                 } catch (Exception e) {
-                    logger.warn("error set enable user agent detector config", e);
+                    logger.warn(e, "error set enable user agent detector config");
                 }
             }
         }
@@ -127,7 +127,7 @@ public class MailerBase implements InitializingBean {
                 }
                 mailer.send(message);
             } catch (Exception e) {
-                logger.error("Error sending email", e);
+                logger.error(e, "Error sending email");
             } finally {
                 info.remove();
             }

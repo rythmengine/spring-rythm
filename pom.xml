@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright 2013 The Spring Rythm Project
   ~
-  ~ The Spring Rythm Project licenses this file to you under the Apache License,
+  ~ The Rythm Project licenses this file to you under the Apache License,
   ~ version 2.0 (the "License"); you may not use this file except in compliance
   ~ with the License. You may obtain a copy of the License at:
   ~
@@ -14,11 +15,12 @@
   ~ under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.rythmengine</groupId>
     <artifactId>spring-rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.0a</version>
 
     <name>Spring Rythm Plugin</name>
     <description>Enable Spring Application Developer to use Rythm Template Engine to render views</description>
@@ -149,6 +151,11 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-tool</artifactId>
+            <version>0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgl</groupId>
+            <artifactId>osgl-logging</artifactId>
             <version>0.2</version>
         </dependency>
     </dependencies>

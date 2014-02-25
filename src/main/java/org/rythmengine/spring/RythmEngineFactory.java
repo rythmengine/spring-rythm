@@ -1,7 +1,7 @@
 package org.rythmengine.spring;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfigurationKey;
@@ -53,7 +53,7 @@ import java.util.*;
  */
 public class RythmEngineFactory extends ApplicationObjectSupport implements Phased {
 
-	protected final Log logger = LogFactory.getLog(getClass());
+    protected final static Logger logger = L.get(RythmEngineFactory.class);
 
 	private Resource configLocation;
 
@@ -207,9 +207,7 @@ public class RythmEngineFactory extends ApplicationObjectSupport implements Phas
 
 		// Load config file if set.
 		if (this.configLocation != null) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Loading Rythm config from [" + this.configLocation + "]");
-			}
+	        logger.info("Loading Rythm config from [%s]", this.configLocation);
 			CollectionUtils.mergePropertiesIntoMap(PropertiesLoaderUtils.loadProperties(this.configLocation), p);
 		}
 

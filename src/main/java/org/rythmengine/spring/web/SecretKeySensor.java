@@ -1,7 +1,7 @@
 package org.rythmengine.spring.web;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.rythmengine.utils.IO;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -20,7 +20,7 @@ public interface SecretKeySensor {
      */
     public static class DefaultSecretKeySensor implements SecretKeySensor {
 
-        protected final Log logger = LogFactory.getLog(getClass());
+        protected final Logger logger = L.get(getClass());
 
         public static final String TAG_FILE = "secret.key";
 
