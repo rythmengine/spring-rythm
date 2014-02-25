@@ -254,7 +254,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
                 sb.append("\u0000");
             }
             String flashData = URLEncoder.encode(sb.toString(), "utf-8");
-            setCookie(flashCookieName, flashData, null, "/", -1, false);
+            setCookie(flashCookieName, flashData, null, "/", 0, false);
         } catch (Exception e) {
             throw new RuntimeException("Flash serializationProblem", e);
         }
