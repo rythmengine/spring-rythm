@@ -149,6 +149,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.1.39</version>
+        </dependency>
+        <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-tool</artifactId>
             <version>0.2</version>

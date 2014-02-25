@@ -98,13 +98,21 @@ public class SessionManager extends HandlerInterceptorAdapter {
         return true;
     }
 
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    private static void persist(HttpServletRequest request, HttpServletResponse response) {
         saveSession();
         saveFlash();
         for (Cookie c : cookie.get().values()) {
             response.addCookie(c);
         }
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        persist(request, response);
+    }
+
+    public static void onRenderResult(HttpServletRequest request, HttpServletResponse response) {
+        persist(request, response);
     }
 
     @Override

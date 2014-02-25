@@ -4,6 +4,7 @@ import org.osgl.exception.FastRuntimeException;
 import org.osgl.util.E;
 import org.rythmengine.spring.web.HttpUtils;
 import org.rythmengine.spring.web.RythmExceptionHandler;
+import org.rythmengine.spring.web.SessionManager;
 import org.rythmengine.utils.S;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -57,6 +58,8 @@ public class Result extends FastRuntimeException {
         if (S.empty(reason)) {
             reason = status.getReasonPhrase();
         }
+
+        SessionManager.onRenderResult(request, response);
 
         String contentType = (null != request) ? HttpUtils.resolveFormat(request).toContentType() : "text/html";
         response.setContentType(contentType);
