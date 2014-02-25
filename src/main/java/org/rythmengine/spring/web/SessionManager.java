@@ -57,7 +57,10 @@ public class SessionManager extends HandlerInterceptorAdapter {
     }
 
     void setSessionPrefix(String prefix) {
-        if (null != prefix) this.sessionCookieName = prefix + "_SESSION";
+        if (null != prefix) {
+            sessionCookieName = prefix + "_SESSION";
+            flashCookieName = prefix + "_FLASH";
+        }
     }
 
     void setSessionExpire(String expire) {
@@ -223,12 +226,12 @@ public class SessionManager extends HandlerInterceptorAdapter {
     }
 
     private static void createFlashCookie(String value) {
-        Cookie cookie = new Cookie(sessionCookieName, value);
+        Cookie cookie = new Cookie(flashCookieName, value);
         cookie.setPath("/");
         if (ttl > -1) {
             cookie.setMaxAge(ttl);
         }
-        SessionManager.cookie.get().put(sessionCookieName, cookie);
+        SessionManager.cookie.get().put(flashCookieName, cookie);
     }
 
     private static void saveFlash() {
