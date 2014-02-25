@@ -182,7 +182,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
         this.sessionCookiePrefix = sessionCookiePrefix;
     }
 
-    public void setConfSessionCookieExpire(String sessionCookieExpire) {
+    public void setSessionCookieExpire(String sessionCookieExpire) {
         Assert.notNull(sessionCookieExpire);
         this.sessionCookieExpire = sessionCookieExpire;
     }
