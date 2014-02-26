@@ -111,9 +111,9 @@ public class SessionManager extends HandlerInterceptorAdapter {
         persist(request, response);
     }
 
-    public static void onRenderResult(HttpServletRequest request, HttpServletResponse response) {
-        persist(request, response);
-    }
+//    public static void onRenderResult(HttpServletRequest request, HttpServletResponse response) {
+//        persist(request, response);
+//    }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
@@ -199,6 +199,10 @@ public class SessionManager extends HandlerInterceptorAdapter {
             // session is empty, delete it from cookie
             createSessionCookie("");
         } else {
+            if (ttl > -1 && !session.contains(TS_KEY)) {
+                // session get cleared before
+                session.put(TS_KEY, System.currentTimeMillis() + ttl * 1000L);
+            }
             StringBuilder sb = new StringBuilder();
             for (String k : session.data.keySet()) {
                 sb.append("\u0000");

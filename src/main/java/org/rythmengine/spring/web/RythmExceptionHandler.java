@@ -52,7 +52,6 @@ public class RythmExceptionHandler implements MessageSourceAware {
     public ModelAndView defaultErrorHandler(Exception e, HttpServletResponse response) throws Exception {
         if (e instanceof Result) {
             Result r = (Result)e;
-            SessionManager._save();
             HttpServletRequest request = SessionManager.request();
             return r.apply(request, response);
         }
