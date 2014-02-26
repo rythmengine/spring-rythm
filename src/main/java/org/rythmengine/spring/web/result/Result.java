@@ -68,8 +68,6 @@ public class Result extends FastRuntimeException {
             return writeToResponse(response, statusCode, reason);
         } catch (IOException e) {
             throw E.ioException(e);
-        } finally {
-            InterceptorCache.applyCompleteHandlers(request, response);
         }
     }
 

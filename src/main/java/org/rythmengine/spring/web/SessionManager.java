@@ -53,7 +53,9 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static final C.List<Listener> listeners = C.newList();
 
     public static void addListener(Listener listener) {
-        listeners.add(listener);
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
     }
 
     void setSessionPrefix(String prefix) {
