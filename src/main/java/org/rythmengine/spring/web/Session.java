@@ -2,7 +2,7 @@ package org.rythmengine.spring.web;
 
 import org.osgl.cache.CacheService;
 import org.osgl.cache.CacheServiceProvider;
-import org.rythmengine.utils.S;
+import org.osgl.util.S;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package org.rythmengine.spring.web;
 
-import org.rythmengine.utils.S;
+import org.osgl.util.S;
 
 import javax.servlet.http.HttpSession;
 import java.util.UUID;

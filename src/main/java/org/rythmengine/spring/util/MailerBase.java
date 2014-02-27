@@ -103,18 +103,21 @@ public class MailerBase implements InitializingBean {
                 helper.setSubject(subject);
                 boolean u = underscoreImplicitVarNames;
                 HttpServletRequest request = SessionManager.request();
-                C.Map<String, Object> params = renderArgs;
-                params.put(u ? "_request" : "request", request);
-                params.put("__request", request);
-                params.put(u ? "_response" : "response", SessionManager.response());
-                HttpSession httpSession = request.getSession(false);
-                params.put(u ? "_httpSession" : "httpSession", httpSession);
-                if (enableSessionManager) {
-                    params.put(u ? "_session" : "session", Session.current());
-                    params.put(u ? "_flash" : "flash", Flash.current());
-                }
-                if (enableUserAgentDetector) {
-                    params.put(u ? "_userAgent" : "userAgent", UADetector.get());
+                if (null != request) {
+                    // so this is running from a http request handling thread
+                    C.Map<String, Object> params = renderArgs;
+                    params.put(u ? "_request" : "request", request);
+                    params.put("__request", request);
+                    params.put(u ? "_response" : "response", SessionManager.response());
+                    HttpSession httpSession = request.getSession(false);
+                    params.put(u ? "_httpSession" : "httpSession", httpSession);
+                    if (enableSessionManager) {
+                        params.put(u ? "_session" : "session", Session.current());
+                        params.put(u ? "_flash" : "flash", Flash.current());
+                    }
+                    if (enableUserAgentDetector) {
+                        params.put(u ? "_userAgent" : "userAgent", UADetector.get());
+                    }
                 }
 
                 if (S.notEmpty(html)) {
