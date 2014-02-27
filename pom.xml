@@ -163,6 +163,11 @@
             <artifactId>osgl-logging</artifactId>
             <version>0.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.osgl</groupId>
+            <artifactId>osgl-cache</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <profiles>

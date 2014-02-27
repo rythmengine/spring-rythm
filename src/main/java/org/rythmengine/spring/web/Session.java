@@ -1,6 +1,7 @@
 package org.rythmengine.spring.web;
 
-import org.rythmengine.spring.util.Cache;
+import org.osgl.cache.CacheService;
+import org.osgl.cache.CacheServiceProvider;
 import org.rythmengine.utils.S;
 
 import java.util.HashMap;
@@ -19,6 +20,20 @@ public class Session {
 
     Map<String, String> data = new HashMap<String, String>(); // ThreadLocal access
     boolean changed = false;
+
+    private static volatile CacheService cache;
+
+    private static CacheService cache() {
+        if (null != cache) {
+            return cache;
+        }
+        synchronized (Session.class) {
+            if (null == cache) {
+                cache = CacheServiceProvider.Impl.Auto.get();
+            }
+        }
+        return cache;
+    }
 
     public static Session current() {
         return SessionManager.session();
@@ -47,12 +62,12 @@ public class Session {
     String getAuthenticityToken() {
         if (sessionManagerEnabled()) {
             String key = atKey();
-            String s = Cache.get(key);
+            String s = cache().get(key);
             if (null == s) {
                 s = UUID.randomUUID().toString();
                 change();
             }
-            Cache.put(key, s, "1h");
+            cache().put(key, s, 60 * 60);
             return s;
         }
         throw new IllegalStateException("Rythm session manager not enabled");
@@ -60,12 +75,12 @@ public class Session {
 
     void clearAuthenticityToken() {
         String key = atKey();
-        Cache.delete(key);
+        cache().evict(key);
     }
 
     static boolean checkAuthenticityToken(String token) {
         String key = current().atKey();
-        String s = Cache.get(key);
+        String s = cache().get(key);
         return S.eq(s, token);
     }
 
@@ -113,43 +128,43 @@ public class Session {
     }
 
     public void cache(String key, Object val) {
-        Cache.put(sessionedKey(key), val);
+        cache().put(sessionedKey(key), val);
     }
 
-    public void cache(String key, Object val, String expiration) {
-        Cache.put(sessionedKey(key), val, expiration);
+    public void cache(String key, Object val, int expiration) {
+        cache().put(sessionedKey(key), val, expiration);
     }
 
     public void cacheFor1Hr(String key, Object val) {
-        Cache.put(sessionedKey(key), val, "1hr");
+        cache().put(sessionedKey(key), val, 60 * 60);
     }
 
     public void cacheFor30Min(String key, Object val) {
-        Cache.put(sessionedKey(key), val, "30mn");
+        cache().put(sessionedKey(key), val, 60 * 30);
     }
 
     public void cacheFor10Min(String key, Object val) {
-        Cache.put(sessionedKey(key), val, "10mn");
+        cache().put(sessionedKey(key), val, 60 * 10);
     }
 
     public void cacheFor5Min(String key, Object val) {
-        Cache.put(sessionedKey(key), val, "5mn");
+        cache().put(sessionedKey(key), val, 60 * 5);
     }
 
     public void cacheFor1Min(String key, Object val) {
-        Cache.put(sessionedKey(key), val, "1mn");
+        cache().put(sessionedKey(key), val, 60);
     }
 
-    public void evict(String key) {
-        Cache.delete(key);
+    public void evictCache(String key) {
+        cache().evict(key);
     }
 
     public <T> T cached(String key) {
-        return (T) Cache.get(sessionedKey(key));
+        return cache().get(sessionedKey(key));
     }
 
     public <T> T cached(String key, Class<T> clz) {
-        return (T) Cache.get(sessionedKey(key));
+        return cache().get(sessionedKey(key));
     }
 
     public void clear() {
@@ -178,6 +193,5 @@ public class Session {
     public String toString() {
         return data.toString();
     }
-
 
 }

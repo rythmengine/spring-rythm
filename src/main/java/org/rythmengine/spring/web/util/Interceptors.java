@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by luog on 26/02/14.
  */
-public class InterceptorCache extends WebMvcConfigurerAdapter {
+public class Interceptors extends WebMvcConfigurerAdapter {
 
     private static volatile C.List<HandlerInterceptor> interceptors;
 
@@ -32,7 +32,7 @@ public class InterceptorCache extends WebMvcConfigurerAdapter {
         if (null != interceptors) {
             return interceptors;
         }
-        synchronized (InterceptorCache.class) {
+        synchronized (Interceptors.class) {
             if (null != interceptors) {
                 return interceptors;
             }

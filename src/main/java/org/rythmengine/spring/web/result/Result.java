@@ -4,7 +4,7 @@ import org.osgl.exception.FastRuntimeException;
 import org.osgl.util.E;
 import org.rythmengine.spring.web.HttpUtils;
 import org.rythmengine.spring.web.RythmExceptionHandler;
-import org.rythmengine.spring.web.util.InterceptorCache;
+import org.rythmengine.spring.web.util.Interceptors;
 import org.rythmengine.utils.S;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -59,7 +59,7 @@ public class Result extends FastRuntimeException {
             reason = status.getReasonPhrase();
         }
 
-        InterceptorCache.applyPostHandlers(request, response);
+        Interceptors.applyPostHandlers(request, response);
 
         String contentType = (null != request) ? HttpUtils.resolveFormat(request).toContentType() : "text/html";
         response.setContentType(contentType);
