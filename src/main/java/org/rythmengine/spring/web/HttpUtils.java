@@ -22,4 +22,5 @@ public enum HttpUtils {
     public static HttpFormat resolveFormat(HttpServletRequest request) {
         return HttpFormat.resolve(request);
     }
+
 }

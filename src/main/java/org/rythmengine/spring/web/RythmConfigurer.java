@@ -98,6 +98,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private String autoImports = null;
 
+    boolean customErrorPages = false;
+
     private static RythmConfigurer inst;
 
     public static RythmConfigurer getInstance() {
@@ -187,6 +189,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
         this.sessionCookieExpire = sessionCookieExpire;
     }
 
+    public void setCustomErrorPages(boolean customErrorPages) {
+        this.customErrorPages = customErrorPages;
+    }
+
     public void setCsrfParamName(String csrfParamName) {
         Assert.notNull(csrfParamName);
         this.csrfParamName = csrfParamName;
@@ -254,28 +260,34 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
             @Override
             public String sourceCode() {
-                return "protected org.rythmengine.utils.RawData url(String path) {\n" +
-                        "if (path == null) path = \"/\";\n" +
-                        "if (!path.startsWith(\"//\") && !path.startsWith(\"http\")) {\n" +
-                        "\tpath = __request.getContextPath() + (path.startsWith(\"/\") ? \"\" : \"/\") + path; \n" +
-                        "}\n" +
-                        "return new org.rythmengine.utils.RawData(path);\n" +
-                        "}\n\n" +
-                        "protected org.rythmengine.utils.RawData fullUrl(String path) {\n" +
-                        "if (path == null) path = \"/\";\n" +
-                        "if (path.startsWith(\"//\") || path.startsWith(\"http\")) {\n" +
-                        "\treturn new org.rythmengine.utils.RawData(path);\n" +
-                        "}\n" +
-                        "if (!path.startsWith(\"/\")) {path = path + \"/\";}\n" +
-                        "String ctx = __request.getContextPath(); StringBuilder sb = new StringBuilder();\n" +
-                        "sb.append(__request.getScheme());\n" +
-                        "sb.append(\"://\");\n" +
-                        "sb.append(__request.getServerName()).append(\":\");\n" +
-                        "sb.append(__request.getServerPort()); \n" +
-                        "sb.append(ctx).append(path);\n" +
-                        "return new org.rythmengine.utils.RawData(sb);" +
-                        "}\n"
-                        ;
+//                return "protected org.rythmengine.utils.RawData url(String path) {\n" +
+//                        "if (path == null) path = \"/\";\n" +
+//                        "if (!path.startsWith(\"//\") && !path.startsWith(\"http\")) {\n" +
+//                        "\tpath = __request.getContextPath() + (path.startsWith(\"/\") ? \"\" : \"/\") + path; \n" +
+//                        "}\n" +
+//                        "return new org.rythmengine.utils.RawData(path);\n" +
+//                        "}\n\n" +
+//                        "protected org.rythmengine.utils.RawData fullUrl(String path) {\n" +
+//                        "if (path == null) path = \"/\";\n" +
+//                        "if (path.startsWith(\"//\") || path.startsWith(\"http\")) {\n" +
+//                        "\treturn new org.rythmengine.utils.RawData(path);\n" +
+//                        "}\n" +
+//                        "if (!path.startsWith(\"/\")) {path = path + \"/\";}\n" +
+//                        "String ctx = __request.getContextPath(); StringBuilder sb = new StringBuilder();\n" +
+//                        "sb.append(__request.getScheme());\n" +
+//                        "sb.append(\"://\");\n" +
+//                        "sb.append(__request.getServerName()).append(\":\");\n" +
+//                        "sb.append(__request.getServerPort()); \n" +
+//                        "sb.append(ctx).append(path);\n" +
+//                        "return new org.rythmengine.utils.RawData(sb);" +
+//                        "}\n"
+//                        ;
+                  return "protected org.rythmengine.utils.RawData url(String path) {\n" +
+                         "\treturn new org.rythmengine.utils.RawData(org.rythmengine.spring.web.util.ControllerUtil.url(path, __request));\n" +
+                         "}\n\n" +
+                         "protected org.rythmengine.utils.RawData fullUrl(String path) {\n" +
+                         "\treturn new org.rythmengine.utils.RawData(org.rythmengine.spring.web.util.ControllerUtil.fullUrl(path, __request));\n" +
+                         "}\n";
             }
 
             @Override
@@ -367,6 +379,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
             sm.setSessionExpire(sessionCookieExpire);
             sm.setSessionPrefix(sessionCookiePrefix);
             registry.addInterceptor(sm);
+        } else {
+            registry.addInterceptor(new ControllerContextInitializer());
         }
         if (autoCsrfCheck) {
             CsrfManager csrfManager = new CsrfManager();

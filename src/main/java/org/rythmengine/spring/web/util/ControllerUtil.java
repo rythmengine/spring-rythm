@@ -145,4 +145,92 @@ public abstract class ControllerUtil {
         return Flash.current();
     }
 
+    private static class Context {
+        String serverName;
+        int serverPort;
+        boolean isSecure;
+        String ctxPath;
+    }
+
+    private static volatile Context context;
+
+    public static void setContext(HttpServletRequest request) {
+        if (null != context) {
+            return;
+        }
+        synchronized (ControllerUtil.class) {
+            if (null != context) return;
+
+            context = new Context();
+            context.serverName = request.getServerName();
+            context.serverPort = request.getServerPort();
+            context.isSecure = request.isSecure();
+            context.ctxPath = ServletContextHolder.getServletContext().getContextPath();
+        }
+    }
+
+    public static String fullUrl(String url) {
+        HttpServletRequest request = SessionManager.request();
+        return fullUrl(url, request);
+    }
+
+    public static String fullUrl(String url, HttpServletRequest request) {
+        if (null == url) url = "/";
+        if (url.startsWith("http:") || url.startsWith("https:")) return url;
+        if (null != request && !url.startsWith("/")) {
+            StringBuffer sb = request.getRequestURL();
+            sb.append("/").append(url);
+            return sb.toString();
+        }
+        String scheme, serverName, ctxPath, reqPath = "";
+        int port;
+        if (null != request) {
+            scheme = request.isSecure() ? "https://" : "http://";
+            serverName = request.getServerName();
+            ctxPath = request.getContextPath();
+            port = request.getServerPort();
+            reqPath = request.getRequestURI();
+        } else {
+            scheme = context.isSecure ? "https://" : "http://";
+            serverName = context.serverName;
+            ctxPath = context.ctxPath;
+            port = context.serverPort;
+        }
+        StringBuilder sb = new StringBuilder(scheme);
+        if (url.startsWith("//")) return sb.append(url.substring(2)).toString();
+        sb.append(serverName);
+        sb.append(":");
+        sb.append(port);
+        if (url.startsWith("/")) sb.append(ctxPath).append(url);
+        else sb.append(ctxPath).append("/").append(url);
+        return sb.toString();
+    }
+
+    public static String url(String url) {
+        HttpServletRequest request = SessionManager.request();
+        return url(url, request);
+    }
+
+    public static String url(String url, HttpServletRequest request) {
+        if (url == null) return "/";
+        if (url.startsWith("//") || url.startsWith("http:") || url.startsWith("https://")) {
+            return url;
+        }
+        if (null != request && !url.startsWith("/")) {
+            StringBuilder sb = new StringBuilder(request.getRequestURI());
+            sb.append("/").append(url);
+            return sb.toString();
+        }
+        String ctxPath = "";
+        if (null != request) {
+            ctxPath = request.getContextPath();
+        } else if (null != context) {
+            ctxPath = context.ctxPath;
+        }
+        StringBuilder sb = new StringBuilder(ctxPath);
+        if (!url.startsWith("/")) sb.append("/");
+        sb.append(url);
+        return sb.toString();
+    }
+
 }

@@ -14,11 +14,20 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by luog on 16/01/14.
  */
 public class Result extends FastRuntimeException {
+
+    private static int[] errorCodes = {
+        403, 404, 500
+    };
+
+    public static boolean isError(int status) {
+        return Arrays.binarySearch(errorCodes, status) != -1;
+    }
 
     private HttpStatus status;
     private MessageSource messageSource;
@@ -72,6 +81,12 @@ public class Result extends FastRuntimeException {
     }
 
     protected ModelAndView writeToResponse(HttpServletResponse response, int statusCode,  String message) throws IOException {
+        ModelAndView mv = new ModelAndView();
+        if (isError(statusCode)) {
+            mv.setViewName("errors/prod/error.html");
+            mv.addObject("statusCode", statusCode);
+            mv.addObject("message", message);
+        }
         response.sendError(statusCode, message);
         return new ModelAndView();
     }

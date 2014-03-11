@@ -77,11 +77,11 @@ public class MailerBase implements InitializingBean {
     }
 
     public static class MailInfo {
-        String from = "noreply@pixolut.com";
+        String from = "noreply@osgl.org";
         C.List<String> recipients = C.newList();
         C.List<String> ccs = C.newList();
         C.List<String> bccs = C.newList();
-        String replyTo = "noreply@pixolut.com";
+        String replyTo = "noreply@osgl.org";
         String subject;
         String charset = "utf-8";
         String contentType = "text/html";
