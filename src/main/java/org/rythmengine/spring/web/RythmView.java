@@ -220,7 +220,7 @@ public class RythmView extends AbstractTemplateView {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             engine.render(response.getOutputStream(), "errors/500.html", e);
         } finally {
-            //renderArgs.remove();
+            RythmEngine.renderCleanUp();
         }
     }
 }

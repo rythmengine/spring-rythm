@@ -3,6 +3,7 @@ package org.rythmengine.spring.web;
 import org.osgl.cache.CacheService;
 import org.osgl.cache.CacheServiceProvider;
 import org.osgl.util.S;
+import org.rythmengine.spring.util.CacheServiceRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class Session {
         synchronized (Session.class) {
             if (null == cache) {
                 cache = CacheServiceProvider.Impl.Auto.get();
+                CacheServiceRegistry.register(cache);
             }
         }
         return cache;

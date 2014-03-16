@@ -5,6 +5,7 @@ import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.ISourceCodeEnhancer;
 import org.rythmengine.spring.RythmEngineFactory;
+import org.rythmengine.spring.util.CacheServiceRegistry;
 import org.rythmengine.template.ITemplate;
 import org.rythmengine.utils.S;
 import org.springframework.beans.factory.DisposableBean;
@@ -218,6 +219,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void destroy() throws Exception {
         if (null != engine) {
             engine.shutdown();
+            CacheServiceRegistry._destroy();
         }
     }
 
