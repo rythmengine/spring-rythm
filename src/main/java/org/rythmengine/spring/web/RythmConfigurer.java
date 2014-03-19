@@ -381,8 +381,6 @@ public class RythmConfigurer extends RythmEngineFactory implements
             sm.setSessionExpire(sessionCookieExpire);
             sm.setSessionPrefix(sessionCookiePrefix);
             registry.addInterceptor(sm);
-        } else {
-            registry.addInterceptor(new ControllerContextInitializer());
         }
         if (autoCsrfCheck) {
             CsrfManager csrfManager = new CsrfManager();

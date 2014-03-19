@@ -1,5 +1,6 @@
 package org.rythmengine.spring.web.util;
 
+import org.osgl.util.S;
 import org.osgl.web.util.UserAgent;
 import org.rythmengine.spring.web.*;
 import org.rythmengine.spring.web.result.*;
@@ -147,25 +148,29 @@ public abstract class ControllerUtil {
 
     private static class Context {
         String serverName;
-        int serverPort;
-        boolean isSecure;
+        int port;
+        int securePort;
         String ctxPath;
+
+        Context(String serverName, int port, int securePort, String ctxtPath) {
+            this.serverName = serverName;
+            this.port = 0 == port ? 80 : port;
+            this.securePort = 0 == securePort ? 443 : securePort;
+            this.ctxPath = S.empty(ctxtPath) ? "" : ctxtPath;
+        }
     }
 
     private static volatile Context context;
 
-    public static void setContext(HttpServletRequest request) {
-        if (null != context) {
-            return;
-        }
+    private static Context getContext() {
+        if (null != context) return context;
         synchronized (ControllerUtil.class) {
-            if (null != context) return;
-
-            context = new Context();
-            context.serverName = request.getServerName();
-            context.serverPort = request.getServerPort();
-            context.isSecure = request.isSecure();
-            context.ctxPath = ServletContextHolder.getServletContext().getContextPath();
+            if (null != context) return context;
+            context = new Context(ServerContext.getHostName(),
+                ServerContext.getPort(),
+                ServerContext.getSecurePort(),
+                ServerContext.getContextPath());
+            return context;
         }
     }
 
@@ -182,19 +187,19 @@ public abstract class ControllerUtil {
             sb.append("/").append(url);
             return sb.toString();
         }
-        String scheme, serverName, ctxPath, reqPath = "";
+        String scheme, serverName, ctxPath;
         int port;
         if (null != request) {
             scheme = request.isSecure() ? "https://" : "http://";
             serverName = request.getServerName();
             ctxPath = request.getContextPath();
             port = request.getServerPort();
-            reqPath = request.getRequestURI();
         } else {
-            scheme = context.isSecure ? "https://" : "http://";
+            Context context = getContext();
+            scheme = "http://";
             serverName = context.serverName;
             ctxPath = context.ctxPath;
-            port = context.serverPort;
+            port = context.port;
         }
         StringBuilder sb = new StringBuilder(scheme);
         if (url.startsWith("//")) return sb.append(url.substring(2)).toString();

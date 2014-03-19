@@ -3,7 +3,6 @@ package org.rythmengine.spring.web;
 import org.osgl._;
 import org.osgl.util.C;
 import org.osgl.util.Crypto;
-import org.rythmengine.spring.web.util.ControllerUtil;
 import org.rythmengine.utils.S;
 import org.rythmengine.utils.Time;
 import org.springframework.beans.factory.InitializingBean;
@@ -74,7 +73,6 @@ public class SessionManager extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         req.set(request);
         resp.set(response);
-        ControllerUtil.setContext(request);
         Cookie[] cookies = request.getCookies();
         Map<String, Cookie> m = new HashMap<String, Cookie>();
         Cookie sessionCookie = null;
