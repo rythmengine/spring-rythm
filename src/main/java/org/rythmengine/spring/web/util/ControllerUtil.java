@@ -110,6 +110,10 @@ public abstract class ControllerUtil {
         throw new Redirect(url);
     }
 
+    protected static void redirect(String urlTmpl, Object... args) {
+        throw new Redirect(S.fmt(urlTmpl, args));
+    }
+
     protected static void setCookie(String name, String value) {
         SessionManager.setCookie(name, value);
     }
