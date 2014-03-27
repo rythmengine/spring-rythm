@@ -106,7 +106,7 @@ class SpringTemplateResource extends TemplateResourceBase implements ITemplateRe
             return key;
         }
         try {
-            return IO.readContentAsString(springResource.getInputStream());
+            return IO.readContentAsString(springResource.getFile());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
