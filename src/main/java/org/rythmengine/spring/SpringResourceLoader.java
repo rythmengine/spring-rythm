@@ -1,8 +1,8 @@
 package org.rythmengine.spring;
 
+import org.osgl.util.S;
 import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.resource.ResourceLoaderBase;
-import org.rythmengine.utils.S;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -53,7 +53,10 @@ class SpringResourceLoader extends ResourceLoaderBase {
     @Override
     public ITemplateResource load(String path) {
         if (!path.startsWith(root) && !path.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
-            path = root  + "/" + path;
+            StringBuilder sb = S.builder(root);
+            if (path.startsWith("/")) sb.append(path);
+            else sb.append("/").append(path);
+            path = sb.toString();
         }
         Resource r = springRsrcLoader.getResource(path);
         if (null == r || !r.isReadable()) {

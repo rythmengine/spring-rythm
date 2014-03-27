@@ -7,6 +7,7 @@ import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.ITemplateResourceLoader;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.Phased;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -137,7 +138,11 @@ public class RythmEngineFactory extends ApplicationObjectSupport implements Phas
 	 * @see org.rythmengine.resource.FileResourceLoader
 	 */
 	public void setResourceLoaderPath(String resourceLoaderPath) {
-		this.resourceLoaderPath = resourceLoaderPath;
+	    if (!resourceLoaderPath.contains("/WEB-INF/rythm")) {
+	        // where the default error page template is located
+            resourceLoaderPath += ",/WEB-INF/rythm";
+        }
+        this.resourceLoaderPath = resourceLoaderPath;
 	}
 
 	/**
@@ -234,11 +239,6 @@ public class RythmEngineFactory extends ApplicationObjectSupport implements Phas
         // Cache
         p.put(RythmConfigurationKey.CACHE_ENABLED.getKey(), enableCache);
 
-        // the i18 message resolver
-        SpringI18nMessageResolver i18n = new SpringI18nMessageResolver();
-        i18n.setApplicationContext(getApplicationContext());
-        p.put(RythmConfigurationKey.I18N_MESSAGE_RESOLVER.getKey(), i18n);
-
 		// Set a resource loader path, if required.
         List<ITemplateResourceLoader> loaders = null;
 		if (this.resourceLoaderPath != null) {
@@ -249,6 +249,14 @@ public class RythmEngineFactory extends ApplicationObjectSupport implements Phas
             }
             p.put(RythmConfigurationKey.RESOURCE_LOADER_IMPLS.getKey(), loaders);
             p.put(RythmConfigurationKey.RESOURCE_DEF_LOADER_ENABLED.getKey(), false);
+        }
+
+        // the i18 message resolver
+        ApplicationContext ctx = getApplicationContext();
+        if (null != ctx) {
+            SpringI18nMessageResolver i18n = new SpringI18nMessageResolver();
+            i18n.setApplicationContext(getApplicationContext());
+            p.put(RythmConfigurationKey.I18N_MESSAGE_RESOLVER.getKey(), i18n);
         }
 
         configRythm(p);

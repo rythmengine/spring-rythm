@@ -3,6 +3,7 @@ package org.rythmengine.spring.web;
 import org.osgl._;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.spring.web.result.Result;
+import org.rythmengine.spring.web.util.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
