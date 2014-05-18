@@ -103,7 +103,9 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static void persist(HttpServletRequest request, HttpServletResponse response) {
         saveSession();
         saveFlash();
-        for (Cookie c : cookie.get().values()) {
+        Map<String, Cookie> cookies = cookie.get();
+        if (null == cookies) return;
+        for (Cookie c : cookies.values()) {
             response.addCookie(c);
         }
     }
