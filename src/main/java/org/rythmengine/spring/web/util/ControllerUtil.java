@@ -7,6 +7,8 @@ import org.rythmengine.spring.web.result.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -84,6 +86,109 @@ public abstract class ControllerUtil {
         // IE9 doesn't support application/json
         UserAgent ua = UADetector.get();
         response().setContentType(ua.isIE9Down() ? "text/plain" : "application/json");
+    }
+
+    /**
+     * Return a 200 OK application/binary response
+     * @param is The stream to copy
+     */
+    protected static void renderBinary(InputStream is) {
+        throw new BinaryResult(is, null, true);
+    }
+
+    /**
+     * Return a 200 OK application/binary response. Content is streamed.
+     *
+     * @param is The stream to copy
+     * @param length Stream's size in bytes.
+     */
+    protected static void renderBinary(InputStream is, long length) {
+        throw new BinaryResult(is, null, length, true);
+    }
+
+    /**
+     * Return a 200 OK application/binary response with content-disposition attachment.
+     *
+     * @param is The stream to copy
+     * @param name Name of file user is downloading.
+     */
+    protected static void renderBinary(InputStream is, String name) {
+        throw new BinaryResult(is, name, false);
+    }
+
+    /**
+     * Return a 200 OK application/binary response with content-disposition attachment.
+     *
+     * @param is The stream to copy. Content is streamed.
+     * @param name Name of file user is downloading.
+     * @param length Stream's size in bytes.
+     */
+    protected static void renderBinary(InputStream is, String name, long length) {
+        throw new BinaryResult(is, name, length, false);
+    }
+
+    /**
+     * Return a 200 OK application/binary response with content-disposition attachment.
+     *
+     * @param is The stream to copy
+     * @param name Name of file user is downloading.
+     * @param inline true to set the response Content-Disposition to inline
+     */
+    protected static void renderBinary(InputStream is, String name, boolean inline) {
+        throw new BinaryResult(is, name, inline);
+    }
+
+    /**
+     * Return a 200 OK application/binary response with content-disposition attachment.
+     *
+     * @param is The stream to copy
+     * @param name The attachment name
+     * @param length Stream's size in bytes.
+     * @param inline true to set the response Content-Disposition to inline
+     */
+    protected static void renderBinary(InputStream is, String name, long length, boolean inline) {
+        throw new BinaryResult(is, name, length, inline);
+    }
+
+    /**
+     * Return a 200 OK application/binary response with content-disposition attachment
+     * @param is The stream to copy
+     * @param name The attachment name
+     * @param contentType The content type of the attachment
+     * @param inline true to set the response Content-Disposition to inline
+     */
+    protected static void renderBinary(InputStream is, String name, String contentType, boolean inline) {
+        throw new BinaryResult(is, name, contentType, inline);
+    }
+
+    /**
+     * Return a 200 OK application/binary response with content-disposition attachment.
+     *
+     * @param is The stream to copy
+     * @param name The attachment name
+     * @param length Content's byte size.
+     * @param contentType The content type of the attachment
+     * @param inline true to set the response Content-Disposition to inline
+     */
+    protected static void renderBinary(InputStream is, String name, long length, String contentType, boolean inline) {
+        throw new BinaryResult(is, name, length, contentType, inline);
+    }
+
+    /**
+     * Return a 200 OK application/binary response
+     * @param file The file to copy
+     */
+    protected static void renderBinary(File file) {
+        throw new BinaryResult(file);
+    }
+
+    /**
+     * Return a 200 OK application/binary response with content-disposition attachment
+     * @param file The file to copy
+     * @param name The attachment name
+     */
+    protected static void renderBinary(File file, String name) {
+        throw new BinaryResult(file, name);
     }
 
     protected static void renderJSON() {

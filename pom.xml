@@ -156,17 +156,22 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-tool</artifactId>
-            <version>0.2</version>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-logging</artifactId>
-            <version>0.2</version>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-cache</artifactId>
             <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgl</groupId>
+            <artifactId>osgl-storage</artifactId>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
