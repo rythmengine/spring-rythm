@@ -199,6 +199,10 @@ public abstract class ControllerUtil {
         throw new JSONResult(json);
     }
 
+    protected static void renderJSON(String tmpl, Object[] args) {
+        renderJSON(String.format(tmpl, args));
+    }
+
     protected static void renderJSON(Object obj) {
         throw new JSONResult(obj);
     }
