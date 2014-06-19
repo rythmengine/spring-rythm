@@ -178,7 +178,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
         RythmConfigurer.secretKey = secretKey;
     }
 
-    public static String getSecretKey() {
+    public static synchronized String getSecretKey() {
+        if (null == secretKey && null != secretKeySensor) {
+            secretKey = secretKeySensor.getSecretKey();
+        }
         return secretKey;
     }
 
@@ -364,7 +367,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         if (enableSessionManager) {
-            if (S.empty(secretKey)) {
+            if (S.empty(getSecretKey())) {
                 throw new RuntimeException("No secure salt configured while session manager is enabled");
             }
             SessionManager sm = new SessionManager();

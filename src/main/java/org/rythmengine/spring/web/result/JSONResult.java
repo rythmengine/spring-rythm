@@ -52,7 +52,7 @@ public class JSONResult extends Result {
     @Override
     protected ModelAndView writeToResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
         UserAgent ua = UADetector.get();
-        response.setContentType(ua.isIE9Down() ? "text/plain" : "application/json");
+        response.setContentType(null != ua && ua.isIE9Down() ? "text/plain" : "application/json");
         if (null != objects) {
             json = com.alibaba.fastjson.JSON.toJSONString(objects);
         } else if (null != object) {
