@@ -77,11 +77,11 @@ public class MailerBase implements InitializingBean {
     }
 
     public static class MailInfo {
-        String from = "noreply@pixolut.com";
+        String from = "noreply@osgl.org";
         C.List<String> recipients = C.newList();
         C.List<String> ccs = C.newList();
         C.List<String> bccs = C.newList();
-        String replyTo = "noreply@pixolut.com";
+        String replyTo = "noreply@osgl.org";
         String subject;
         String charset = "utf-8";
         String contentType = "text/html";
@@ -103,18 +103,21 @@ public class MailerBase implements InitializingBean {
                 helper.setSubject(subject);
                 boolean u = underscoreImplicitVarNames;
                 HttpServletRequest request = SessionManager.request();
-                C.Map<String, Object> params = renderArgs;
-                params.put(u ? "_request" : "request", request);
-                params.put("__request", request);
-                params.put(u ? "_response" : "response", SessionManager.response());
-                HttpSession httpSession = request.getSession(false);
-                params.put(u ? "_httpSession" : "httpSession", httpSession);
-                if (enableSessionManager) {
-                    params.put(u ? "_session" : "session", Session.current());
-                    params.put(u ? "_flash" : "flash", Flash.current());
-                }
-                if (enableUserAgentDetector) {
-                    params.put(u ? "_userAgent" : "userAgent", UADetector.get());
+                if (null != request) {
+                    // so this is running from a http request handling thread
+                    C.Map<String, Object> params = renderArgs;
+                    params.put(u ? "_request" : "request", request);
+                    params.put("__request", request);
+                    params.put(u ? "_response" : "response", SessionManager.response());
+                    HttpSession httpSession = request.getSession(false);
+                    params.put(u ? "_httpSession" : "httpSession", httpSession);
+                    if (enableSessionManager) {
+                        params.put(u ? "_session" : "session", Session.current());
+                        params.put(u ? "_flash" : "flash", Flash.current());
+                    }
+                    if (enableUserAgentDetector) {
+                        params.put(u ? "_userAgent" : "userAgent", UADetector.get());
+                    }
                 }
 
                 if (S.notEmpty(html)) {

@@ -5,6 +5,7 @@ import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.ISourceCodeEnhancer;
 import org.rythmengine.spring.RythmEngineFactory;
+import org.rythmengine.spring.util.CacheServiceRegistry;
 import org.rythmengine.template.ITemplate;
 import org.rythmengine.utils.S;
 import org.springframework.beans.factory.DisposableBean;
@@ -40,9 +41,9 @@ import java.util.*;
 @EnableWebMvc
 @ComponentScan("org.rythmengine.spring.web")
 public class RythmConfigurer extends RythmEngineFactory implements
-    RythmHolder, InitializingBean, DisposableBean,
-    ResourceLoaderAware, ServletContextAware,
-    WebMvcConfigurer {
+        RythmHolder, InitializingBean, DisposableBean,
+        ResourceLoaderAware, ServletContextAware,
+        WebMvcConfigurer {
 
     /**
      * so that app developer can retrieve the servlet context with
@@ -98,6 +99,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private String autoImports = null;
 
+    boolean customErrorPages = false;
+
     private static RythmConfigurer inst;
 
     public static RythmConfigurer getInstance() {
@@ -129,7 +132,9 @@ public class RythmConfigurer extends RythmEngineFactory implements
         this.autoCsrfCheck = autoCsrfCheck;
     }
 
-    public void setAutoImports(String autoImports) {this.autoImports = autoImports;}
+    public void setAutoImports(String autoImports) {
+        this.autoImports = autoImports;
+    }
 
     public void setEnableCacheFor(boolean enableCacheFor) {
         this.enableCacheFor = enableCacheFor;
@@ -148,7 +153,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     }
 
     public void setSecretKeySensor(String secretKeySensor) throws Exception {
-        Class<SecretKeySensor> c = (Class<SecretKeySensor>)Class.forName(secretKeySensor);
+        Class<SecretKeySensor> c = (Class<SecretKeySensor>) Class.forName(secretKeySensor);
         this.secretKeySensor = c.newInstance();
     }
 
@@ -173,7 +178,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
         RythmConfigurer.secretKey = secretKey;
     }
 
-    public static String getSecretKey() {
+    public static synchronized String getSecretKey() {
+        if (null == secretKey && null != secretKeySensor) {
+            secretKey = secretKeySensor.getSecretKey();
+        }
         return secretKey;
     }
 
@@ -182,9 +190,13 @@ public class RythmConfigurer extends RythmEngineFactory implements
         this.sessionCookiePrefix = sessionCookiePrefix;
     }
 
-    public void setConfSessionCookieExpire(String sessionCookieExpire) {
+    public void setSessionCookieExpire(String sessionCookieExpire) {
         Assert.notNull(sessionCookieExpire);
         this.sessionCookieExpire = sessionCookieExpire;
+    }
+
+    public void setCustomErrorPages(boolean customErrorPages) {
+        this.customErrorPages = customErrorPages;
     }
 
     public void setCsrfParamName(String csrfParamName) {
@@ -212,6 +224,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void destroy() throws Exception {
         if (null != engine) {
             engine.shutdown();
+            CacheServiceRegistry._destroy();
         }
     }
 
@@ -221,26 +234,9 @@ public class RythmConfigurer extends RythmEngineFactory implements
         userContext.put(key, v);
     }
 
-    @Override
-    protected void configRythm(Map<String, Object> config) {
-        WebApplicationContext ctx = (WebApplicationContext)getApplicationContext();
-        boolean allowFileWrite = true;
-        Object o = config.get(RythmConfigurationKey.ENGINE_FILE_WRITE_ENABLED.getKey());
-        if (null != o) {
-            allowFileWrite = Boolean.parseBoolean(String.valueOf(o));
-        }
-        if (allowFileWrite && !config.containsKey(RythmConfigurationKey.HOME_TMP.getKey())) {
-            File tmpdir = (File)ctx.getServletContext().getAttribute("javax.servlet.context.tempdir");
-            if (null != tmpdir) {
-                tmpdir = new File(tmpdir, "__rythm");
-                if (!tmpdir.exists()) {
-                    tmpdir.mkdirs();
-                }
-                config.put(RythmConfigurationKey.HOME_TMP.getKey(), tmpdir);
-            }
-        }
-
-        config.put(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER.getKey(), new ISourceCodeEnhancer() {
+    public static ISourceCodeEnhancer sourceCodeEnhancer(final String autoImports,
+                                                         final boolean underscoreImplicitVariableName) {
+        return new ISourceCodeEnhancer() {
             ImplicitVariables implicitVariables = new ImplicitVariables(underscoreImplicitVariableName);
 
             @Override
@@ -255,27 +251,11 @@ public class RythmConfigurer extends RythmEngineFactory implements
             @Override
             public String sourceCode() {
                 return "protected org.rythmengine.utils.RawData url(String path) {\n" +
-                        "if (path == null) path = \"/\";\n" +
-                        "if (!path.startsWith(\"//\") && !path.startsWith(\"http\")) {\n" +
-                        "\tpath = __request.getContextPath() + (path.startsWith(\"/\") ? \"\" : \"/\") + path; \n" +
-                        "}\n" +
-                        "return new org.rythmengine.utils.RawData(path);\n" +
+                        "\treturn new org.rythmengine.utils.RawData(org.rythmengine.spring.web.util.ControllerUtil.url(path, __request));\n" +
                         "}\n\n" +
                         "protected org.rythmengine.utils.RawData fullUrl(String path) {\n" +
-                        "if (path == null) path = \"/\";\n" +
-                        "if (path.startsWith(\"//\") || path.startsWith(\"http\")) {\n" +
-                        "\treturn new org.rythmengine.utils.RawData(path);\n" +
-                        "}\n" +
-                        "if (!path.startsWith(\"/\")) {path = path + \"/\";}\n" +
-                        "String ctx = __request.getContextPath(); StringBuilder sb = new StringBuilder();\n" +
-                        "sb.append(__request.getScheme());\n" +
-                        "sb.append(\"://\");\n" +
-                        "sb.append(__request.getServerName()).append(\":\");\n" +
-                        "sb.append(__request.getServerPort()); \n" +
-                        "sb.append(ctx).append(path);\n" +
-                        "return new org.rythmengine.utils.RawData(sb);" +
-                        "}\n"
-                        ;
+                        "\treturn new org.rythmengine.utils.RawData(org.rythmengine.spring.web.util.ControllerUtil.fullUrl(path, __request));\n" +
+                        "}\n";
             }
 
             @Override
@@ -290,13 +270,40 @@ public class RythmConfigurer extends RythmEngineFactory implements
             @Override
             public void setRenderArgs(ITemplate template) {
                 // already set in RythmView
-//                Map<String, Object> m = new HashMap<String, Object>();
-//                for (ImplicitVariables.Var var : implicitVariables.vars) {
-//                    m.put(var.name(), var.evaluate());
-//                }
-//                template.__setRenderArgs(m);
+                //                Map<String, Object> m = new HashMap<String, Object>();
+                //                for (ImplicitVariables.Var var : implicitVariables.vars) {
+                //                    m.put(var.name(), var.evaluate());
+                //                }
+                //                template.__setRenderArgs(m);
             }
-        });
+        };
+    }
+
+    @Override
+    protected void configRythm(Map<String, Object> config) {
+        WebApplicationContext ctx = (WebApplicationContext) getApplicationContext();
+        boolean allowFileWrite = true;
+        Object o = config.get(RythmConfigurationKey.ENGINE_FILE_WRITE_ENABLED.getKey());
+        if (null != o) {
+            allowFileWrite = Boolean.parseBoolean(String.valueOf(o));
+        }
+        if (allowFileWrite && !config.containsKey(RythmConfigurationKey.HOME_TMP.getKey())) {
+            File tmpdir;
+            if (null != ctx) {
+                tmpdir = (File) ctx.getServletContext().getAttribute("javax.servlet.context.tempdir");
+            } else {
+                tmpdir = new File(System.getProperty("java.io.tmpdir"));
+            }
+            if (null != tmpdir) {
+                tmpdir = new File(tmpdir, "__rythm");
+                if (!tmpdir.exists()) {
+                    tmpdir.mkdirs();
+                }
+                config.put(RythmConfigurationKey.HOME_TMP.getKey(), tmpdir);
+            }
+        }
+
+        config.put(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER.getKey(), sourceCodeEnhancer(autoImports, underscoreImplicitVariableName));
     }
 
     @Override
@@ -360,7 +367,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         if (enableSessionManager) {
-            if (S.empty(secretKey)) {
+            if (S.empty(getSecretKey())) {
                 throw new RuntimeException("No secure salt configured while session manager is enabled");
             }
             SessionManager sm = new SessionManager();

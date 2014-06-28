@@ -53,11 +53,16 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static final C.List<Listener> listeners = C.newList();
 
     public static void addListener(Listener listener) {
-        listeners.add(listener);
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
     }
 
     void setSessionPrefix(String prefix) {
-        if (null != prefix) this.sessionCookieName = prefix + "_SESSION";
+        if (null != prefix) {
+            sessionCookieName = prefix + "_SESSION";
+            flashCookieName = prefix + "_FLASH";
+        }
     }
 
     void setSessionExpire(String expire) {
@@ -95,14 +100,24 @@ public class SessionManager extends HandlerInterceptorAdapter {
         return true;
     }
 
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    private static void persist(HttpServletRequest request, HttpServletResponse response) {
         saveSession();
         saveFlash();
-        for (Cookie c : cookie.get().values()) {
+        Map<String, Cookie> cookies = cookie.get();
+        if (null == cookies) return;
+        for (Cookie c : cookies.values()) {
             response.addCookie(c);
         }
     }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        persist(request, response);
+    }
+
+//    public static void onRenderResult(HttpServletRequest request, HttpServletResponse response) {
+//        persist(request, response);
+//    }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
@@ -188,6 +203,10 @@ public class SessionManager extends HandlerInterceptorAdapter {
             // session is empty, delete it from cookie
             createSessionCookie("");
         } else {
+            if (ttl > -1 && !session.contains(TS_KEY)) {
+                // session get cleared before
+                session.put(TS_KEY, System.currentTimeMillis() + ttl * 1000L);
+            }
             StringBuilder sb = new StringBuilder();
             for (String k : session.data.keySet()) {
                 sb.append("\u0000");
@@ -223,12 +242,12 @@ public class SessionManager extends HandlerInterceptorAdapter {
     }
 
     private static void createFlashCookie(String value) {
-        Cookie cookie = new Cookie(sessionCookieName, value);
+        Cookie cookie = new Cookie(flashCookieName, value);
         cookie.setPath("/");
         if (ttl > -1) {
             cookie.setMaxAge(ttl);
         }
-        SessionManager.cookie.get().put(sessionCookieName, cookie);
+        SessionManager.cookie.get().put(flashCookieName, cookie);
     }
 
     private static void saveFlash() {

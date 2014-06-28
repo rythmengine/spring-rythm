@@ -1,6 +1,7 @@
 package org.rythmengine.spring.web;
 
 import org.osgl.web.util.UserAgent;
+import org.rythmengine.utils.S;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +21,10 @@ public class UADetector extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String s = request.getHeader(HttpHeaders.USER_AGENT);
-        UserAgent ua = UserAgent.valueOf(s);
-        current.set(ua);
+        if (S.notEmpty(s)) {
+            UserAgent ua = UserAgent.valueOf(s);
+            current.set(ua);
+        }
         return true;
     }
 

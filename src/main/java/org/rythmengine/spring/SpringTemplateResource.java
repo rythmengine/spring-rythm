@@ -7,8 +7,10 @@ import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.resource.TemplateResourceBase;
 import org.rythmengine.utils.IO;
 import org.springframework.core.io.*;
+import org.springframework.util.ResourceUtils;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created with IntelliJ IDEA.
@@ -106,6 +108,14 @@ class SpringTemplateResource extends TemplateResourceBase implements ITemplateRe
             return key;
         }
         try {
+            if (getEngine().isDevMode()) {
+                URL url = springResource.getURL();
+                if (ResourceUtils.URL_PROTOCOL_FILE.equals(url.getProtocol())) {
+                    // this ensures it always load the file changes
+                    // instead of cached content in the inputstream
+                    return IO.readContentAsString(springResource.getFile());
+                }
+            }
             return IO.readContentAsString(springResource.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);

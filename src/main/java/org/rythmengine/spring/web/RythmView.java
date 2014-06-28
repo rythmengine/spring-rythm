@@ -128,7 +128,7 @@ public class RythmView extends AbstractTemplateView {
 
     @Override
     public boolean checkResource(Locale locale) throws Exception {
-        if (null != tc) {
+        if (null != tc && tc.isDefinable()) {
             return true;
         }
         if (!rsrc.isValid()) {
@@ -153,14 +153,42 @@ public class RythmView extends AbstractTemplateView {
 
     static final ThreadLocal<Map<String, Object>> renderArgs = new ThreadLocal<Map<String, Object>>();
 
+    private void prepareImplicitArgs(Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
+        boolean u = underscoreImplicitVarNames;
+        params.put(u ? "_request" : "request", request);
+        params.put("__request", request);
+        params.put(u ? "_response" : "response", response);
+        HttpSession httpSession = request.getSession(false);
+        params.put(u ? "_httpSession" : "httpSession", httpSession);
+        if (enableSessionManager) {
+            params.put(u ? "_session" : "session", Session.current());
+            params.put(u ? "_flash" : "flash", Flash.current());
+        }
+        if (enableUserAgentDetector) {
+            params.put(u ? "_userAgent" : "userAgent", UADetector.get());
+        }
+
+        String csrfHeaderName = engine.getProperty(RythmConfigurer.CONF_CSRF_HEADER_NAME);
+        String csrfParamName = engine.getProperty(RythmConfigurer.CONF_CSRF_PARAM_NAME);
+        Csrf csrf = null != Session.current() ?
+                new Csrf(csrfParamName, csrfHeaderName) :
+                new Csrf(csrfParamName, csrfHeaderName, request.getSession());
+        params.put(u ? "_csrf" : "csrf", csrf);
+    }
+
     @Override
     protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         RythmEngine engine = this.engine;
+        Map<String, Object> params = new HashMap<String, Object>();
         if (null != re) {
             checkResource(null);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            engine.render(response.getOutputStream(), "errors/500.html", re);
-            return;
+            if (null != re) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                prepareImplicitArgs(params, request, response);
+                params.put("exception", re);
+                engine.render(response.getOutputStream(), "errors/500.html", params);
+                return;
+            }
         }
 
         Locale locale = LocaleContextHolder.getLocale();
@@ -171,7 +199,6 @@ public class RythmView extends AbstractTemplateView {
                 tc = engine.getTemplateClass(rsrc);
             }
             TemplateBase t = (TemplateBase) tc.asTemplate(engine);
-            Map<String, Object> params = new HashMap<String, Object>();
             if (outputReqParams) {
                 Map reqMap = request.getParameterMap();
                 for (Object o : reqMap.keySet()) {
@@ -184,27 +211,8 @@ public class RythmView extends AbstractTemplateView {
                     }
                 }
             }
+            prepareImplicitArgs(params, request, response);
             params.putAll(model);
-            boolean u = underscoreImplicitVarNames;
-            params.put(u ? "_request" : "request", request);
-            params.put("__request", request);
-            params.put(u ? "_response" : "response", response);
-            HttpSession httpSession = request.getSession(false);
-            params.put(u ? "_httpSession" : "httpSession", httpSession);
-            if (enableSessionManager) {
-                params.put(u ? "_session" : "session", Session.current());
-                params.put(u ? "_flash" : "flash", Flash.current());
-            }
-            if (enableUserAgentDetector) {
-                params.put(u ? "_userAgent" : "userAgent", UADetector.get());
-            }
-
-            String csrfHeaderName = engine.getProperty(RythmConfigurer.CONF_CSRF_HEADER_NAME);
-            String csrfParamName = engine.getProperty(RythmConfigurer.CONF_CSRF_PARAM_NAME);
-            Csrf csrf = null != Session.current() ?
-                    new Csrf(csrfParamName, csrfHeaderName) :
-                    new Csrf(csrfParamName, csrfHeaderName, request.getSession());
-            params.put(u ? "_csrf" : "csrf", csrf);
             //renderArgs.set(params);
             t.__setRenderArgs(params);
             // TODO fix this: doesn't work when extends is taking place
@@ -220,7 +228,7 @@ public class RythmView extends AbstractTemplateView {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             engine.render(response.getOutputStream(), "errors/500.html", e);
         } finally {
-            //renderArgs.remove();
+            RythmEngine.renderCleanUp();
         }
     }
 }

@@ -21,6 +21,11 @@ public class Redirect extends Result {
         E.npeIf(S.empty(url));
     }
 
+    public Redirect(String url, Object ... args) {
+        super(HttpStatus.TEMPORARY_REDIRECT, S.fmt(url, args));
+        E.npeIf(S.empty(url));
+    }
+
     @Override
     protected ModelAndView writeToResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
         //response.sendRedirect(getMessage());
