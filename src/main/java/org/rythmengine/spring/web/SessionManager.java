@@ -179,6 +179,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static void createSessionCookie(String value) {
         Cookie cookie = new Cookie(sessionCookieName, value);
         cookie.setPath("/");
+        cookie.setSecure(true);
         if (ttl > -1) {
             cookie.setMaxAge(ttl);
         }

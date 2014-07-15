@@ -138,7 +138,7 @@ public class MailerBase implements InitializingBean {
     }
 
     private static boolean isEmail(String s) {
-        return s.matches("^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})$");
+        return s.matches("(?i:^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})$)");
     }
 
     protected static MailInfo setFrom(String from) {
