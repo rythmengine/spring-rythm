@@ -18,6 +18,7 @@ public class Session {
     static final String AT_KEY = "___AT";
     static final String ID_KEY = "___ID";
     static final String TS_KEY = "___TS";
+    static final String EXPIRE_KEY = "___EXPIRED";
 
     Map<String, String> data = new HashMap<String, String>(); // ThreadLocal access
     boolean changed = false;

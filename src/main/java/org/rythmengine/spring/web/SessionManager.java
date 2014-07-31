@@ -46,10 +46,13 @@ public class SessionManager extends HandlerInterceptorAdapter {
     static final String AT_KEY = Session.AT_KEY;
     static final String ID_KEY = Session.ID_KEY;
     static final String TS_KEY = Session.TS_KEY;
+    public static final String EXPIRE_KEY = Session.EXPIRE_KEY;
 
     private static String sessionCookieName = DEFAULT_COOKIE_PREFIX + "_SESSION";
     private static String flashCookieName = DEFAULT_COOKIE_PREFIX + "_FLASH";
     private static int ttl = -1;
+    private static boolean cookieSecure = false;
+    private static boolean noPersistentCookie = true;
     private static final C.List<Listener> listeners = C.newList();
 
     public static void addListener(Listener listener) {
@@ -67,6 +70,14 @@ public class SessionManager extends HandlerInterceptorAdapter {
 
     void setSessionExpire(String expire) {
         if (null != expire) ttl = Time.parseDuration(expire);
+    }
+
+    void setCookieSecure(boolean secure) {
+        cookieSecure = secure;
+    }
+
+    void setNoPersistentCookie(boolean value) {
+        noPersistentCookie = value;
     }
 
     @Override
@@ -106,8 +117,20 @@ public class SessionManager extends HandlerInterceptorAdapter {
         Map<String, Cookie> cookies = cookie.get();
         if (null == cookies) return;
         for (Cookie c : cookies.values()) {
-            response.addCookie(c);
+            String cookieName = c.getName();
+            // workaround for servlet 2.5 doesn't support httpOnly cookie issue
+            if (S.eq(cookieName, flashCookieName) || S.eq(cookieName, sessionCookieName)) {
+                writeHttpOnlyCookie(c, response);
+            } else {
+                response.addCookie(c);
+            }
         }
+    }
+
+    private static void writeHttpOnlyCookie(Cookie cookie, HttpServletResponse resp) {
+        StringBuffer sb = new StringBuffer();
+        TomcatServerCookieHelper.appendCookieValue(sb, cookie.getVersion(), cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getDomain(), cookie.getComment(), cookie.getMaxAge(), cookie.getSecure(), true);
+        resp.addHeader("Set-Cookie", sb.toString());
     }
 
     @Override
@@ -167,6 +190,9 @@ public class SessionManager extends HandlerInterceptorAdapter {
                     if ((Long.parseLong(session.get(TS_KEY))) < System.currentTimeMillis()) {
                         // Session expired
                         session = new Session();
+                        session.put(EXPIRE_KEY, true);
+                    } else {
+                        session.remove(EXPIRE_KEY);
                     }
                 }
                 session.put(TS_KEY, System.currentTimeMillis() + expiration);
@@ -176,14 +202,14 @@ public class SessionManager extends HandlerInterceptorAdapter {
         listeners.accept(F.onSessionResolved(session));
     }
 
-    private static void createSessionCookie(String value) {
+    private static Cookie createSessionCookie(String value) {
         Cookie cookie = new Cookie(sessionCookieName, value);
         cookie.setPath("/");
-        cookie.setSecure(true);
-        if (ttl > -1) {
+        cookie.setSecure(cookieSecure);
+        if (ttl > -1 && !noPersistentCookie) {
             cookie.setMaxAge(ttl);
         }
-        SessionManager.cookie.get().put(sessionCookieName, cookie);
+        return cookie;
     }
 
     static void _save() {
@@ -200,9 +226,11 @@ public class SessionManager extends HandlerInterceptorAdapter {
             // Nothing changed and no cookie-expire, consequently send nothing back.
             return;
         }
+
+        Cookie sessionCookie;
         if (session.isEmpty()) {
             // session is empty, delete it from cookie
-            createSessionCookie("");
+            sessionCookie = createSessionCookie("");
         } else {
             if (ttl > -1 && !session.contains(TS_KEY)) {
                 // session get cleared before
@@ -219,11 +247,12 @@ public class SessionManager extends HandlerInterceptorAdapter {
             try {
                 String data = URLEncoder.encode(sb.toString(), "utf-8");
                 String sign = sign(data);
-                createSessionCookie(sign + "-" + data);
+                sessionCookie = createSessionCookie(sign + "-" + data);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("How come utf-8 is not recognized?");
             }
         }
+        SessionManager.cookie.get().put(sessionCookieName, sessionCookie);
     }
 
     private void resolveFlash(Cookie cookie) {
@@ -242,13 +271,14 @@ public class SessionManager extends HandlerInterceptorAdapter {
         fla.set(flash);
     }
 
-    private static void createFlashCookie(String value) {
+    private static Cookie createFlashCookie(String value) {
         Cookie cookie = new Cookie(flashCookieName, value);
         cookie.setPath("/");
         if (ttl > -1) {
             cookie.setMaxAge(ttl);
         }
-        SessionManager.cookie.get().put(flashCookieName, cookie);
+        cookie.setSecure(cookieSecure);
+        return cookie;
     }
 
     private static void saveFlash() {
@@ -257,24 +287,26 @@ public class SessionManager extends HandlerInterceptorAdapter {
             return;
         }
         Map<String, String> out = flash.out;
+        Cookie flashCookie;
         if (out.isEmpty()) {
-            setCookie(flashCookieName, "", null, "/", 0, false);
-            return;
-        }
-        try {
-            StringBuilder sb = new StringBuilder();
-            for (String key : out.keySet()) {
-                sb.append("\u0000");
-                sb.append(key);
-                sb.append(":");
-                sb.append(out.get(key));
-                sb.append("\u0000");
+            flashCookie = createFlashCookie("");
+        } else {
+            try {
+                StringBuilder sb = new StringBuilder();
+                for (String key : out.keySet()) {
+                    sb.append("\u0000");
+                    sb.append(key);
+                    sb.append(":");
+                    sb.append(out.get(key));
+                    sb.append("\u0000");
+                }
+                String flashData = URLEncoder.encode(sb.toString(), "utf-8");
+                flashCookie = createFlashCookie(flashData);
+            } catch (Exception e) {
+                throw new RuntimeException("Flash serializationProblem", e);
             }
-            String flashData = URLEncoder.encode(sb.toString(), "utf-8");
-            setCookie(flashCookieName, flashData, null, "/", -1, false);
-        } catch (Exception e) {
-            throw new RuntimeException("Flash serializationProblem", e);
         }
+        cookie.get().put(flashCookieName, flashCookie);
     }
 
     public static String sign(String s) {

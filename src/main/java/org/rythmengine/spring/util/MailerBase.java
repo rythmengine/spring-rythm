@@ -81,7 +81,7 @@ public class MailerBase implements InitializingBean {
         C.List<String> recipients = C.newList();
         C.List<String> ccs = C.newList();
         C.List<String> bccs = C.newList();
-        String replyTo = "noreply@osgl.org";
+        String replyTo = null;
         String subject;
         String charset = "utf-8";
         String contentType = "text/html";

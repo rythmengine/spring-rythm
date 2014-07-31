@@ -81,6 +81,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private String sessionCookieExpire = null;
 
+    private boolean sessionCookieSecure = false;
+
+    private boolean transientSessionCookie = true;
+
     private boolean autoCsrfCheck = true;
 
     private boolean enableSessionManager = false;
@@ -193,6 +197,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void setSessionCookieExpire(String sessionCookieExpire) {
         Assert.notNull(sessionCookieExpire);
         this.sessionCookieExpire = sessionCookieExpire;
+    }
+
+    public void setTransientSessionCookie(boolean value) {
+        this.transientSessionCookie = value;
     }
 
     public void setCustomErrorPages(boolean customErrorPages) {
@@ -317,6 +325,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
         engine.setProperty(CONF_ENABLE_USER_AGENT_DETECTOR, enableUserAgentDetector);
         if (null != csrfHeaderName) engine.setProperty(CONF_CSRF_HEADER_NAME, csrfHeaderName);
         if (null != csrfParamName) engine.setProperty(CONF_CSRF_PARAM_NAME, csrfParamName);
+        sessionCookieSecure = engine.isProdMode();
     }
 
     @Override
@@ -373,6 +382,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
             SessionManager sm = new SessionManager();
             sm.setSessionExpire(sessionCookieExpire);
             sm.setSessionPrefix(sessionCookiePrefix);
+            sm.setCookieSecure(sessionCookieSecure);
+            sm.setNoPersistentCookie(transientSessionCookie);
             registry.addInterceptor(sm);
         }
         if (autoCsrfCheck) {

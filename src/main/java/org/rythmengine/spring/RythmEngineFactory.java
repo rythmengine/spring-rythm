@@ -264,12 +264,6 @@ public class RythmEngineFactory extends ApplicationObjectSupport implements Phas
 		// Apply properties to RythmEngine.
         RythmEngine engine = newRythmEngine(p);
 
-        if (null != loaders) {
-            for (ITemplateResourceLoader loader : loaders) {
-                loader.setEngine(engine);
-            }
-        }
-
 		postProcessRythmEngine(engine);
 
 		return engine;
