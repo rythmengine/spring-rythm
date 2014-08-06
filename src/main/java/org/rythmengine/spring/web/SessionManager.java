@@ -274,7 +274,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static Cookie createFlashCookie(String value) {
         Cookie cookie = new Cookie(flashCookieName, value);
         cookie.setPath("/");
-        if (ttl > -1) {
+        if (ttl > -1 && !noPersistentCookie) {
             cookie.setMaxAge(ttl);
         }
         cookie.setSecure(cookieSecure);
