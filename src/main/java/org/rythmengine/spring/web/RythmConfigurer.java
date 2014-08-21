@@ -81,6 +81,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private String sessionCookieExpire = null;
 
+    private String pingPath = null;
+
     private boolean sessionCookieSecure = false;
 
     private boolean transientSessionCookie = true;
@@ -197,6 +199,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void setSessionCookieExpire(String sessionCookieExpire) {
         Assert.notNull(sessionCookieExpire);
         this.sessionCookieExpire = sessionCookieExpire;
+    }
+
+    public void setPingPath(String pingPath) {
+        this.pingPath = pingPath;
     }
 
     public void setTransientSessionCookie(boolean value) {
@@ -384,6 +390,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
             sm.setSessionPrefix(sessionCookiePrefix);
             sm.setCookieSecure(sessionCookieSecure);
             sm.setNoPersistentCookie(transientSessionCookie);
+            sm.setPingPath(pingPath);
             registry.addInterceptor(sm);
         }
         if (autoCsrfCheck) {

@@ -20,7 +20,7 @@
     <groupId>org.rythmengine</groupId>
     <artifactId>spring-rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 
     <name>Spring Rythm Plugin</name>
     <description>Enable Spring Application Developer to use Rythm Template Engine to render views</description>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>org.rythmengine</groupId>
             <artifactId>rythm-engine</artifactId>
-            <version>1.0.1</version>
+            <version>1.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

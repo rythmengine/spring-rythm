@@ -159,7 +159,7 @@ public class Session {
     }
 
     public void evictCache(String key) {
-        cache().evict(key);
+        cache().evict(sessionedKey(key));
     }
 
     public <T> T cached(String key) {

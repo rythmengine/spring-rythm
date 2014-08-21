@@ -1,14 +1,9 @@
 package org.rythmengine.spring.web;
 
+import org.rythmengine.utils.S;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
+import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
-/**
- * Created with IntelliJ IDEA.
- * User: luog
- * Date: 2/12/13
- * Time: 1:34 PM
- * To change this template use File | Settings | File Templates.
- */
 public class RythmViewResolver extends AbstractTemplateViewResolver {
 
     public RythmViewResolver() {
@@ -23,4 +18,12 @@ public class RythmViewResolver extends AbstractTemplateViewResolver {
    		return RythmView.class;
    	}
 
+    @Override
+    protected AbstractUrlBasedView buildView(String viewName) throws Exception {
+        if (S.empty(viewName)) {
+            return RythmView.EMPTY_VIEW;
+        } else {
+            return super.buildView(viewName);
+        }
+    }
 }

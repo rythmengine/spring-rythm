@@ -54,6 +54,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static boolean cookieSecure = false;
     private static boolean noPersistentCookie = true;
     private static final C.List<Listener> listeners = C.newList();
+    private static String pingPath;
 
     public static void addListener(Listener listener) {
         if (!listeners.contains(listener)) {
@@ -80,6 +81,10 @@ public class SessionManager extends HandlerInterceptorAdapter {
         noPersistentCookie = value;
     }
 
+    void setPingPath(String uri) {
+        pingPath = uri;
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         req.set(request);
@@ -104,7 +109,8 @@ public class SessionManager extends HandlerInterceptorAdapter {
 //                }
             }
         }
-        resolveSession(sessionCookie);
+        String uri = request.getRequestURI();
+        resolveSession(sessionCookie, uri);
         session().getAuthenticityToken();
         resolveFlash(flashCookie);
         cookie.set(m);
@@ -160,7 +166,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         listeners.accept(F.ON_SESSION_CLEAN_UP);
     }
 
-    private void resolveSession(Cookie cookie) throws Exception {
+    private void resolveSession(Cookie cookie, String uri) throws Exception {
         Session session = new Session();
         final long expiration = ttl * 1000L;
         String value = null == cookie ? null : cookie.getValue();
@@ -183,9 +189,12 @@ public class SessionManager extends HandlerInterceptorAdapter {
                 }
             }
             if (ttl > -1) {
+                long newTimestamp = System.currentTimeMillis() + expiration;
                 // Verify that the session contains a timestamp, and that it's not expired
                 if (!session.contains(TS_KEY)) {
                     session = new Session();
+                } else if (S.eq(pingPath, uri)) {
+                    newTimestamp = Long.parseLong(session.get(TS_KEY));
                 } else {
                     if ((Long.parseLong(session.get(TS_KEY))) < System.currentTimeMillis()) {
                         // Session expired
@@ -195,7 +204,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
                         session.remove(EXPIRE_KEY);
                     }
                 }
-                session.put(TS_KEY, System.currentTimeMillis() + expiration);
+                session.put(TS_KEY, newTimestamp);
             }
         }
         sess.set(session);

@@ -231,4 +231,15 @@ public class RythmView extends AbstractTemplateView {
             RythmEngine.renderCleanUp();
         }
     }
+
+    static final AbstractTemplateView EMPTY_VIEW = new AbstractTemplateView() {
+        @Override
+        protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+            IO.close(response.getWriter());
+        }
+
+        @Override
+        public void afterPropertiesSet() throws Exception {
+        }
+    };
 }
