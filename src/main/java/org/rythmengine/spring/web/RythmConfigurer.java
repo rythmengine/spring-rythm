@@ -26,6 +26,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.*;
 
 import javax.servlet.ServletContext;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -335,6 +336,11 @@ public class RythmConfigurer extends RythmEngineFactory implements
     }
 
     @Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		
+	}
+    
+    @Override
     public Validator getValidator() {
         return null;
     }
@@ -411,4 +417,5 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 
     }
+
 }
