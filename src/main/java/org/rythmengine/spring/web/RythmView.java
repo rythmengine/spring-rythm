@@ -226,7 +226,16 @@ public class RythmView extends AbstractTemplateView {
             }
         } catch (RythmException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            engine.render(response.getOutputStream(), "errors/500.html", e);
+            if (engine.isDevMode()) {
+                engine.render(response.getOutputStream(), "errors/500.html", e);
+            } else {
+                RythmExceptionHandler.getInternalServerErrorVisitor().visit(e);
+                Map<String, Object> args = new HashMap<String, Object>();
+                args.put("message", "Internal server error");
+                args.put("attachment", e);
+                String s = engine.render("errors/prod/500.html", args);
+                IO.writeContent(s, response.getWriter());
+            }
         } finally {
             RythmEngine.renderCleanUp();
         }

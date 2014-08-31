@@ -49,7 +49,7 @@ public class RythmExceptionHandler implements MessageSourceAware {
 
     boolean customErrorPages;
 
-    private InternalServerErrorVisitor internalServerErrorVisitor;
+    private static InternalServerErrorVisitor internalServerErrorVisitor;
 
     @Autowired
     public RythmExceptionHandler(RythmConfigurer conf) {
@@ -60,6 +60,10 @@ public class RythmExceptionHandler implements MessageSourceAware {
     @Autowired(required = false)
     public void setInternalServerErrorVisitor(InternalServerErrorVisitor errorVisitor) {
         internalServerErrorVisitor = errorVisitor;
+    }
+
+    static InternalServerErrorVisitor getInternalServerErrorVisitor() {
+        return internalServerErrorVisitor;
     }
 
     @ExceptionHandler(value = Exception.class)
@@ -83,7 +87,7 @@ public class RythmExceptionHandler implements MessageSourceAware {
                 modelAndView.addObject("statusCode", statusCode);
                 modelAndView.addObject("message", reason);
                 modelAndView.addObject("attachment", e);
-                modelAndView.setViewName("errors/prod/error.html");
+                modelAndView.setViewName("errors/prod/500.html");
                 return modelAndView;
             }
             if (!StringUtils.hasLength(reason)) {
@@ -102,7 +106,7 @@ public class RythmExceptionHandler implements MessageSourceAware {
                 modelAndView.addObject("statusCode", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 modelAndView.addObject("message", "Internal server error");
                 modelAndView.addObject("attachment", e);
-                modelAndView.setViewName("errors/prod/error.html");
+                modelAndView.setViewName("errors/prod/500.html");
                 return modelAndView;
             }
             throw e;
