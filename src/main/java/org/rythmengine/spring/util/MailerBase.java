@@ -15,6 +15,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * Created by luog on 23/01/14.
@@ -145,6 +146,7 @@ public class MailerBase implements InitializingBean {
         E.illegalArgumentIf(!isEmail(from));
         MailInfo mi = info.get();
         mi.from = from;
+        mi.replyTo = from;
         return mi;
     }
 
@@ -176,6 +178,13 @@ public class MailerBase implements InitializingBean {
         return mi;
     }
 
+    protected static MailInfo addRecipients(List<String> mails) {
+        MailInfo mi = info.get();
+        if (mails.size() == 0) return mi;
+        mi.recipients.addAll(mails);
+        return mi;
+    }
+
     protected static MailInfo addCc(String... mail) {
         MailInfo mi = info.get();
         if (mail.length == 0) return mi;
@@ -183,10 +192,24 @@ public class MailerBase implements InitializingBean {
         return mi;
     }
 
+    protected static MailInfo addCc(List<String> mails) {
+        MailInfo mi = info.get();
+        if (mails.size() == 0) return mi;
+        mi.ccs.addAll(mails);
+        return mi;
+    }
+
     protected static MailInfo addBcc(String... mail) {
         MailInfo mi = info.get();
         if (mail.length == 0) return mi;
         mi.bccs.addAll(C.listOf(mail));
+        return mi;
+    }
+
+    protected static MailInfo addBcc(List<String> mails) {
+        MailInfo mi = info.get();
+        if (mails.size() == 0) return mi;
+        mi.bccs.addAll(mails);
         return mi;
     }
 
