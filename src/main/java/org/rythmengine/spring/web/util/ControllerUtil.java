@@ -85,6 +85,7 @@ public abstract class ControllerUtil {
     protected static void setJSON() {
         // IE9 doesn't support application/json
         UserAgent ua = UADetector.get();
+
         response().setContentType(ua.isIE9Down() ? "text/plain" : "application/json");
     }
 

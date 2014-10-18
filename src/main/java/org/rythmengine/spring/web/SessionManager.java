@@ -18,6 +18,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +47,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     static final String AT_KEY = Session.AT_KEY;
     static final String ID_KEY = Session.ID_KEY;
     static final String TS_KEY = Session.TS_KEY;
+    static final String FP_KEY = Session.FP_KEY;
     public static final String EXPIRE_KEY = Session.EXPIRE_KEY;
 
     private static String sessionCookieName = DEFAULT_COOKIE_PREFIX + "_SESSION";
@@ -55,6 +57,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static boolean noPersistentCookie = true;
     private static final C.List<Listener> listeners = C.newList();
     private static String pingPath;
+    private static boolean useIpAffinity;
 
     public static void addListener(Listener listener) {
         if (!listeners.contains(listener)) {
@@ -166,12 +169,35 @@ public class SessionManager extends HandlerInterceptorAdapter {
         listeners.accept(F.ON_SESSION_CLEAN_UP);
     }
 
+    public static String remoteAddress(HttpServletRequest req) {
+        String ip = req.getHeader("X_FORWARDED_FOR");
+        if (S.empty(ip)) {
+            ip = req.getRemoteAddr();
+        }
+        return ip;
+    }
+
+    private static String fingerPrint() {
+        HttpServletRequest req = request();
+        String ip = remoteAddress(req);
+        String userAgent = req.getHeader(HttpHeaders.USER_AGENT);
+        return UUID.nameUUIDFromBytes((ip + userAgent).getBytes()).toString();
+    }
+
+    private static void verifyFingerPrint(Session session) {
+        if (!useIpAffinity) return;
+        String storedFP = session.get(FP_KEY), validFP = fingerPrint();
+        if (null != storedFP && S.ne(storedFP, validFP)) {
+
+        }
+    }
+
     private void resolveSession(Cookie cookie, String uri) throws Exception {
         Session session = new Session();
         final long expiration = ttl * 1000L;
         String value = null == cookie ? null : cookie.getValue();
         if (S.empty(value)) {
-            // no previous cookie to restore; but we may have to set the timestamp in the new cookie
+            // no previous cookie to restore; but we have to set the timestamp in the new cookie
             if (ttl > -1) {
                 session.put(TS_KEY, System.currentTimeMillis() + expiration);
             }
