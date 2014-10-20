@@ -1,5 +1,6 @@
 package org.rythmengine.spring.web;
 
+import org.osgl.util.C;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
@@ -102,6 +103,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
     private String csrfParamName = null;
 
     private String csrfHeaderName = null;
+
+    private List<String> csrfWaiveList = C.list();
 
     private String autoImports = null;
 
@@ -216,6 +219,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void setCsrfParamName(String csrfParamName) {
         Assert.notNull(csrfParamName);
         this.csrfParamName = csrfParamName;
+    }
+
+    public void setCsrfWaiveList(List<String> list) {
+        this.csrfWaiveList = C.list(list);
     }
 
     public void setCsrfHeaderName(String csrfHeaderName) {
@@ -397,6 +404,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
             CsrfManager csrfManager = new CsrfManager();
             csrfManager.setParameterName(csrfParamName);
             csrfManager.setHeaderName(csrfHeaderName);
+            csrfManager.setWaiveList(csrfWaiveList);
             registry.addInterceptor(csrfManager);
         }
         if (enableCacheFor && enableCache) {
