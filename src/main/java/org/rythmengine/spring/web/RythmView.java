@@ -192,7 +192,7 @@ public class RythmView extends AbstractTemplateView {
         }
 
         Locale locale = LocaleContextHolder.getLocale();
-        engine.prepare(locale);
+        engine = engine.prepare(locale);
         try {
             TemplateClass tc = this.tc;
             if (engine.mode().isDev()) {

@@ -1,5 +1,7 @@
 package org.rythmengine.spring.web;
 
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.osgl.util.C;
 import org.osgl.util.ListBuilder;
 import org.rythmengine.utils.S;
@@ -11,10 +13,9 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/**
- * Created by luog on 6/12/13.
- */
 public class CsrfManager extends HandlerInterceptorAdapter {
+
+    Logger logger = L.get(CsrfManager.class);
 
     private String parameterName = Csrf.DEFAULT_PARAMETER_NAME;
     private String headerName = Csrf.DEFAULT_HEADER_NAME;
@@ -42,8 +43,11 @@ public class CsrfManager extends HandlerInterceptorAdapter {
     private boolean shouldWaiveCsrfCheck(HttpServletRequest request) {
         String path = request.getRequestURI();
         for (Pattern p: waiveList) {
-            if (p.matcher(path).matches()) return true;
+            if (p.matcher(path).matches()) {
+                return true;
+            }
         }
+        logger.debug("request url cannot be waived: %s", path);
         return false;
     }
 
@@ -64,6 +68,7 @@ public class CsrfManager extends HandlerInterceptorAdapter {
 
         if (RythmConfigurer.getInstance().sessionManagerEnabled()) {
             if (!Session.checkAuthenticityToken(token)) {
+                logger.error("Cannot verify the authenticity token for request: %s", request.getRequestURI());
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bad authenticity token");
                 return false;
             }

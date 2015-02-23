@@ -1,6 +1,8 @@
 package org.rythmengine.spring.web;
 
 import org.osgl._;
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.osgl.util.C;
 import org.osgl.util.Crypto;
 import org.rythmengine.utils.S;
@@ -22,10 +24,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by luog on 7/12/13.
- */
 public class SessionManager extends HandlerInterceptorAdapter {
+
+    Logger logger = L.get(SessionManager.class);
 
     public static interface Listener {
         void onSessionResolved(Session session);
@@ -219,9 +220,10 @@ public class SessionManager extends HandlerInterceptorAdapter {
                 // Verify that the session contains a timestamp, and that it's not expired
                 if (!session.contains(TS_KEY)) {
                     session = new Session();
-                } else if (S.eq(pingPath, uri)) {
-                    newTimestamp = Long.parseLong(session.get(TS_KEY));
                 } else {
+                    if (S.eq(pingPath, uri)) {
+                        newTimestamp = Long.parseLong(session.get(TS_KEY));
+                    }
                     if ((Long.parseLong(session.get(TS_KEY))) < System.currentTimeMillis()) {
                         // Session expired
                         session = new Session();

@@ -1,5 +1,7 @@
 package org.rythmengine.spring.web.util;
 
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.osgl.util.S;
 
 import javax.servlet.http.HttpServletRequest;
