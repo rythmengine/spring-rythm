@@ -1,6 +1,7 @@
 package org.rythmengine.spring.web;
 
 import org.osgl.util.C;
+import org.osgl.util.S;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
@@ -8,7 +9,6 @@ import org.rythmengine.extension.ISourceCodeEnhancer;
 import org.rythmengine.spring.RythmEngineFactory;
 import org.rythmengine.spring.util.CacheServiceRegistry;
 import org.rythmengine.template.ITemplate;
-import org.rythmengine.utils.S;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
@@ -31,13 +31,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Created with IntelliJ IDEA.
- * User: luog
- * Date: 2/12/13
- * Time: 7:58 PM
- * To change this template use File | Settings | File Templates.
- */
 @Configuration
 @EnableWebMvc
 @ComponentScan("org.rythmengine.spring.web")
@@ -389,7 +382,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         if (enableSessionManager) {
-            if (S.empty(getSecretKey())) {
+            if (S.blank(getSecretKey())) {
                 throw new RuntimeException("No secure salt configured while session manager is enabled");
             }
             SessionManager sm = new SessionManager();

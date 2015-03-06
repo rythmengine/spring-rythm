@@ -2,9 +2,9 @@ package org.rythmengine.spring.web.result;
 
 import org.osgl.util.E;
 import org.osgl.util.IO;
+import org.osgl.util.S;
 import org.osgl.web.util.UserAgent;
 import org.rythmengine.spring.web.UADetector;
-import org.rythmengine.utils.S;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * Created by luog on 26/02/14.
- */
 public class JSONResult extends Result {
 
     private String json;
@@ -27,7 +24,7 @@ public class JSONResult extends Result {
 
     public JSONResult(String json) {
         super(HttpStatus.OK);
-        E.illegalArgumentIf(S.empty(json));
+        E.illegalArgumentIf(S.blank(json));
         this.json = json;
     }
 

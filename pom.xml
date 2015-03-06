@@ -20,6 +20,7 @@
  =========
  * 1.1.0 - base version
  * 1.1.1 - request to ping path shall also subject to session timestamp check and invalidate session if expired
+ * 1.2 - update osgl lib versions
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -27,7 +28,7 @@
     <groupId>org.rythmengine</groupId>
     <artifactId>spring-rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
 
     <name>Spring Rythm Plugin</name>
     <description>Enable Spring Application Developer to use Rythm Template Engine to render views</description>
@@ -105,7 +106,7 @@
         <dependency>
             <groupId>org.rythmengine</groupId>
             <artifactId>rythm-engine</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -163,22 +164,22 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-tool</artifactId>
-            <version>0.3-SNAPSHOT</version>
+            <version>0.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-logging</artifactId>
-            <version>0.3-SNAPSHOT</version>
+            <version>0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-cache</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>0.3.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-storage</artifactId>
-            <version>0.3-SNAPSHOT</version>
+            <version>0.4-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

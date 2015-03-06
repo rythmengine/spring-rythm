@@ -2,10 +2,10 @@ package org.rythmengine.spring.web.result;
 
 import org.osgl.exception.FastRuntimeException;
 import org.osgl.util.E;
+import org.osgl.util.S;
 import org.rythmengine.spring.web.HttpUtils;
 import org.rythmengine.spring.web.RythmExceptionHandler;
 import org.rythmengine.spring.web.util.Interceptors;
-import org.rythmengine.utils.S;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -16,9 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
-/**
- * Created by luog on 16/01/14.
- */
 public class Result extends FastRuntimeException {
 
     private static int[] errorCodes = {
@@ -64,7 +61,7 @@ public class Result extends FastRuntimeException {
         if (this.messageSource != null) {
             reason = this.messageSource.getMessage(reason, null, reason, LocaleContextHolder.getLocale());
         }
-        if (S.empty(reason)) {
+        if (S.blank(reason)) {
             reason = status.getReasonPhrase();
         }
 

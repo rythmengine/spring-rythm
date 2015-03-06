@@ -1,8 +1,8 @@
 package org.rythmengine.spring.web;
 
+import org.osgl.util.S;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.utils.IO;
-import org.rythmengine.utils.S;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -13,9 +13,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by luog on 5/12/13.
- */
 public class CacheInterceptor extends HandlerInterceptorAdapter {
 
     static class KeyAndTTL {
@@ -71,7 +68,7 @@ public class CacheInterceptor extends HandlerInterceptorAdapter {
         }
 
         String key = p.getKey(c.sessionSensitive(), c.schemeSensitive(), c.langSensitive());
-        if (S.empty(key)) {
+        if (S.blank(key)) {
             return true;
         }
         Object o = engine.cached(key);

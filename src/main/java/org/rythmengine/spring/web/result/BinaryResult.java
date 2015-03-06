@@ -126,7 +126,7 @@ public class BinaryResult extends Result {
 
     @Override
     protected ModelAndView writeToResponse(HttpServletResponse resp, int statusCode, String message) throws IOException {
-        boolean hasName = S.notEmpty(name);
+        boolean hasName = S.notBlank(name);
         try {
             if (null != contentType) {
                 resp.setContentType(contentType);

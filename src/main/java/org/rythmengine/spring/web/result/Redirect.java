@@ -8,9 +8,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Created by luog on 30/12/13.
- */
 public class Redirect extends Result {
 
     /**
@@ -18,12 +15,12 @@ public class Redirect extends Result {
      */
     public Redirect(String url) {
         super(HttpStatus.TEMPORARY_REDIRECT, url);
-        E.npeIf(S.empty(url));
+        E.npeIf(S.blank(url));
     }
 
     public Redirect(String url, Object ... args) {
         super(HttpStatus.TEMPORARY_REDIRECT, S.fmt(url, args));
-        E.npeIf(S.empty(url));
+        E.npeIf(S.blank(url));
     }
 
     @Override

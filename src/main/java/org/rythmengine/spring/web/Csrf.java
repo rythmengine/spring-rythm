@@ -18,11 +18,11 @@ public class Csrf {
     public final String value;
 
     public Csrf(String parameterName, String headerName) {
-        if (S.empty(parameterName)) {
+        if (S.blank(parameterName)) {
             parameterName = DEFAULT_PARAMETER_NAME;
         }
         this.parameterName = parameterName;
-        if (S.empty(headerName)) {
+        if (S.blank(headerName)) {
             headerName = DEFAULT_HEADER_NAME;
         }
         this.headerName = headerName;
@@ -30,11 +30,11 @@ public class Csrf {
     }
 
     public Csrf(String parameterName, String headerName, HttpSession session) {
-        if (S.empty(parameterName)) {
+        if (S.blank(parameterName)) {
             parameterName = DEFAULT_PARAMETER_NAME;
         }
         this.parameterName = parameterName;
-        if (S.empty(headerName)) {
+        if (S.blank(headerName)) {
             headerName = DEFAULT_HEADER_NAME;
         }
         this.headerName = headerName;

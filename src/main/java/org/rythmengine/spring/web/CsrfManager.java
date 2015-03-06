@@ -4,7 +4,7 @@ import org.osgl.logging.L;
 import org.osgl.logging.Logger;
 import org.osgl.util.C;
 import org.osgl.util.ListBuilder;
-import org.rythmengine.utils.S;
+import org.osgl.util.S;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,18 +22,18 @@ public class CsrfManager extends HandlerInterceptorAdapter {
     private List<Pattern> waiveList = C.list();
 
     void setParameterName(String parameterName) {
-        if (S.notEmpty(parameterName)) this.parameterName = parameterName;
+        if (S.notBlank(parameterName)) this.parameterName = parameterName;
     }
 
     void setHeaderName(String headerName) {
-        if (S.notEmpty(headerName)) this.headerName = headerName;
+        if (S.notBlank(headerName)) this.headerName = headerName;
     }
 
     void setWaiveList(List<String> list) {
         if (list.isEmpty()) return;
         ListBuilder<Pattern> lb = ListBuilder.create();
         for (String s: list) {
-            if (S.empty(s)) continue;
+            if (S.blank(s)) continue;
             s = s.trim().toLowerCase();
             lb.add(Pattern.compile(s, Pattern.CASE_INSENSITIVE));
         }
@@ -79,7 +79,7 @@ public class CsrfManager extends HandlerInterceptorAdapter {
                 return false;
             }
             String s = (String)httpSession.getAttribute(Csrf.SESSION_KEY);
-            if (S.ne(s, token)) {
+            if (S.neq(s, token)) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bad authenticity token");
                 return false;
             }

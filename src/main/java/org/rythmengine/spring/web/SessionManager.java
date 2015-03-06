@@ -5,7 +5,7 @@ import org.osgl.logging.L;
 import org.osgl.logging.Logger;
 import org.osgl.util.C;
 import org.osgl.util.Crypto;
-import org.rythmengine.utils.S;
+import org.osgl.util.S;
 import org.rythmengine.utils.Time;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.servlet.ModelAndView;
@@ -172,7 +172,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
 
     public static String remoteAddress(HttpServletRequest req) {
         String ip = req.getHeader("X_FORWARDED_FOR");
-        if (S.empty(ip)) {
+        if (S.blank(ip)) {
             ip = req.getRemoteAddr();
         }
         return ip;
@@ -188,7 +188,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static void verifyFingerPrint(Session session) {
         if (!useIpAffinity) return;
         String storedFP = session.get(FP_KEY), validFP = fingerPrint();
-        if (null != storedFP && S.ne(storedFP, validFP)) {
+        if (null != storedFP && S.neq(storedFP, validFP)) {
 
         }
     }
@@ -197,7 +197,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         Session session = new Session();
         final long expiration = ttl * 1000L;
         String value = null == cookie ? null : cookie.getValue();
-        if (S.empty(value)) {
+        if (S.blank(value)) {
             // no previous cookie to restore; but we have to set the timestamp in the new cookie
             if (ttl > -1) {
                 session.put(TS_KEY, System.currentTimeMillis() + expiration);

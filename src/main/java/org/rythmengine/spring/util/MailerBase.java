@@ -5,9 +5,9 @@ import org.osgl.logging.L;
 import org.osgl.logging.Logger;
 import org.osgl.util.C;
 import org.osgl.util.E;
+import org.osgl.util.S;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.spring.web.*;
-import org.rythmengine.utils.S;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -98,8 +98,8 @@ public class MailerBase implements InitializingBean {
                 if (!recipients.isEmpty()) helper.setTo(recipients.toArray(sa));
                 if (!ccs.isEmpty()) helper.setCc(ccs.toArray(sa));
                 if (!bccs.isEmpty()) helper.setBcc(bccs.toArray(sa));
-                if (S.notEmpty(from)) helper.setFrom(from);
-                if (S.notEmpty(replyTo)) helper.setReplyTo(replyTo);
+                if (S.notBlank(from)) helper.setFrom(from);
+                if (S.notBlank(replyTo)) helper.setReplyTo(replyTo);
 
                 helper.setSubject(subject);
                 boolean u = underscoreImplicitVarNames;
@@ -121,11 +121,11 @@ public class MailerBase implements InitializingBean {
                     }
                 }
 
-                if (S.notEmpty(html)) {
+                if (S.notBlank(html)) {
                     html = engine().render(html, renderArgs);
                     helper.setText(html, true);
                 }
-                if (S.notEmpty(text)) {
+                if (S.notBlank(text)) {
                     text = engine.render(text, renderArgs);
                     helper.setText(text, false);
                 }
@@ -152,21 +152,21 @@ public class MailerBase implements InitializingBean {
 
     protected static MailInfo setContentType(String contentType) {
         MailInfo mi = info.get();
-        if (S.empty(contentType)) return mi;
+        if (S.blank(contentType)) return mi;
         mi.contentType = contentType;
         return mi;
     }
 
     protected static MailInfo setCharSet(String charset) {
         MailInfo mi = info.get();
-        if (S.empty(charset)) return mi;
+        if (S.blank(charset)) return mi;
         mi.charset = charset;
         return mi;
     }
 
     protected static MailInfo setSubject(String subject) {
         MailInfo mi = info.get();
-        if (S.empty(subject)) return mi;
+        if (S.blank(subject)) return mi;
         mi.subject = subject;
         return mi;
     }
@@ -215,14 +215,14 @@ public class MailerBase implements InitializingBean {
 
     protected static MailInfo setText(String text) {
         MailInfo mi = info.get();
-        if (S.empty(text)) return mi;
+        if (S.blank(text)) return mi;
         mi.text = text;
         return mi;
     }
 
     protected static MailInfo setHtml(String html) {
         MailInfo mi = info.get();
-        if (S.empty(html)) return mi;
+        if (S.blank(html)) return mi;
         mi.html = html;
         return mi;
     }

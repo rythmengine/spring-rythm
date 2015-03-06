@@ -35,8 +35,8 @@ class SpringResourceLoader extends ResourceLoaderBase {
         if (null == springRsrcLoader) {
             throw new NullPointerException();
         }
-        if (S.empty(root)) {
-            throw new IllegalArgumentException("root cannot be empty");
+        if (S.blank(root)) {
+            throw new IllegalArgumentException("root cannot be empty or blank string");
         }
         this.springRsrcLoader = springRsrcLoader;
         if (root.endsWith("/")) {

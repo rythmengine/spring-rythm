@@ -270,7 +270,7 @@ public abstract class ControllerUtil {
             this.serverName = serverName;
             this.port = 0 == port ? 80 : port;
             this.securePort = 0 == securePort ? 443 : securePort;
-            this.ctxPath = S.empty(ctxtPath) ? "" : ctxtPath;
+            this.ctxPath = S.blank(ctxtPath) ? "" : ctxtPath;
         }
     }
 

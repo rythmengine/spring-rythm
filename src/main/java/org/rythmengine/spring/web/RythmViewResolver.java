@@ -1,6 +1,6 @@
 package org.rythmengine.spring.web;
 
-import org.rythmengine.utils.S;
+import org.osgl.util.S;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
@@ -20,7 +20,7 @@ public class RythmViewResolver extends AbstractTemplateViewResolver {
 
     @Override
     protected AbstractUrlBasedView buildView(String viewName) throws Exception {
-        if (S.empty(viewName)) {
+        if (S.blank(viewName)) {
             return RythmView.EMPTY_VIEW;
         } else {
             return super.buildView(viewName);
