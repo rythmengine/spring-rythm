@@ -181,7 +181,7 @@ public class MailerBase implements InitializingBean {
     protected static MailInfo addRecipients(List<String> mails) {
         MailInfo mi = info.get();
         if (mails.size() == 0) return mi;
-        mi.recipients.addAll(mails);
+        mi.recipients.addAll(C.list(mails).filter(S.F.NOT_EMPTY));
         return mi;
     }
 
