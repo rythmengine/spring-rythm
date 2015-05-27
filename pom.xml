@@ -21,6 +21,7 @@
  * 1.1.0 - base version
  * 1.1.1 - request to ping path shall also subject to session timestamp check and invalidate session if expired
  * 1.2 - update osgl lib versions
+ * 1.2.1 - fix issue: MailerBase treat "green+1@email.com" as invalid email
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -28,7 +29,7 @@
     <groupId>org.rythmengine</groupId>
     <artifactId>spring-rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2.1-SNAPSHOT</version>
 
     <name>Spring Rythm Plugin</name>
     <description>Enable Spring Application Developer to use Rythm Template Engine to render views</description>
