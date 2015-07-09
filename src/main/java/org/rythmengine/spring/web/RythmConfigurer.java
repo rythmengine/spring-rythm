@@ -7,10 +7,13 @@ import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.ISourceCodeEnhancer;
 import org.rythmengine.spring.RythmEngineFactory;
+import org.rythmengine.spring.RythmEngineInitialized;
 import org.rythmengine.spring.util.CacheServiceRegistry;
 import org.rythmengine.template.ITemplate;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +40,7 @@ import java.util.*;
 public class RythmConfigurer extends RythmEngineFactory implements
         RythmHolder, InitializingBean, DisposableBean,
         ResourceLoaderAware, ServletContextAware,
-        WebMvcConfigurer {
+        WebMvcConfigurer, ApplicationEventPublisherAware {
 
     /**
      * so that app developer can retrieve the servlet context with
@@ -103,6 +106,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     boolean customErrorPages = false;
 
+    private ApplicationEventPublisher eventPublisher;
+
     private static RythmConfigurer inst;
 
     public static RythmConfigurer getInstance() {
@@ -111,6 +116,11 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     public void setRythmEngine(RythmEngine engine) {
         this.engine = engine;
+    }
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.eventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -227,6 +237,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void afterPropertiesSet() throws Exception {
         if (null == engine) {
             engine = createRythmEngine();
+            eventPublisher.publishEvent(new RythmEngineInitialized(engine));
         }
         inst = this;
         if (null == secretKey) {
