@@ -5,6 +5,8 @@ import org.osgl.util.E;
 import org.osgl.util.S;
 import org.rythmengine.spring.web.HttpUtils;
 import org.rythmengine.spring.web.RythmExceptionHandler;
+import org.rythmengine.spring.web.Session;
+import org.rythmengine.spring.web.SessionManager;
 import org.rythmengine.spring.web.util.Interceptors;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -80,12 +82,17 @@ public class Result extends FastRuntimeException {
     protected ModelAndView writeToResponse(HttpServletResponse response, int statusCode,  String message) throws IOException {
         ModelAndView mv = new ModelAndView();
         if (isError(statusCode)) {
+            response.sendError(statusCode, message);
+            HttpServletRequest request = SessionManager.request();
+            if (HttpUtils.isAjax(request)) {
+                response.flushBuffer();
+                return null;
+            }
             mv.setViewName("errors/prod/error.html");
             mv.addObject("statusCode", statusCode);
             mv.addObject("message", message);
         }
-        response.sendError(statusCode, message);
-        return new ModelAndView();
+        return mv;
     }
 
 }

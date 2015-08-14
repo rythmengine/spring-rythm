@@ -80,7 +80,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private String pingPath = null;
 
-    private boolean sessionCookieSecure = false;
+    private Boolean sessionCookieSecure = null;
 
     private boolean transientSessionCookie = true;
 
@@ -158,6 +158,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     public void setEnableUserAgentDetector(boolean enableUserAgentDetector) {
         this.enableUserAgentDetector = enableUserAgentDetector;
+    }
+
+    public void setSessionSecure(boolean sessionSecure) {
+        this.sessionCookieSecure = sessionSecure;
     }
 
     public boolean sessionManagerEnabled() {
@@ -342,7 +346,9 @@ public class RythmConfigurer extends RythmEngineFactory implements
         engine.setProperty(CONF_ENABLE_USER_AGENT_DETECTOR, enableUserAgentDetector);
         if (null != csrfHeaderName) engine.setProperty(CONF_CSRF_HEADER_NAME, csrfHeaderName);
         if (null != csrfParamName) engine.setProperty(CONF_CSRF_PARAM_NAME, csrfParamName);
-        sessionCookieSecure = engine.isProdMode();
+        if (null == sessionCookieSecure) {
+            sessionCookieSecure = engine.isProdMode();
+        }
     }
 
     @Override
