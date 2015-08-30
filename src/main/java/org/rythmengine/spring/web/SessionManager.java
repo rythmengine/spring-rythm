@@ -5,9 +5,14 @@ import org.osgl.logging.L;
 import org.osgl.logging.Logger;
 import org.osgl.util.C;
 import org.osgl.util.Crypto;
+import org.osgl.util.E;
 import org.osgl.util.S;
+import org.rythmengine.spring.util.LongSession;
+import org.rythmengine.spring.util.ShortSession;
 import org.rythmengine.utils.Time;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -16,10 +21,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +47,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         }
     }
 
+    public static final String ATTR_LONG_SESSION = "__long_sess__";
     public static final String DEFAULT_COOKIE_PREFIX = "WHLAB";
     public static final int DEFAULT_COOKIE_EXPIRE = 60 * 60 * 24 * 30;
 
@@ -93,6 +101,8 @@ public class SessionManager extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         req.set(request);
         resp.set(response);
+        boolean longSession = isLongSession(handler);
+        request.setAttribute(ATTR_LONG_SESSION, longSession);
         Cookie[] cookies = request.getCookies();
         Map<String, Cookie> m = new HashMap<String, Cookie>();
         Cookie sessionCookie = null;
@@ -114,15 +124,56 @@ public class SessionManager extends HandlerInterceptorAdapter {
             }
         }
         String uri = request.getRequestURI();
-        resolveSession(sessionCookie, uri);
+        resolveSession(sessionCookie, uri, longSession);
         session().getAuthenticityToken();
         resolveFlash(flashCookie);
         cookie.set(m);
         return true;
     }
 
+    private static Set<Object> longSessionRequests = C.newSet();
+    private static Set<Object> shortSessionRequests = C.newSet();
+
+    private static boolean isLongSession(Object handler) {
+        if (shortSessionRequests.contains(handler)) {
+            return false;
+        }
+        if (longSessionRequests.contains(handler)) {
+            return true;
+        }
+        Method m;
+        if (handler instanceof HandlerMethod) {
+            m = ((HandlerMethod) handler).getMethod();
+        } else if (handler instanceof Method) {
+            m = (Method) handler;
+        } else {
+            throw E.unexpected("Unknown handler type: %s", handler.getClass());
+        }
+        if (AnnotationUtils.findAnnotation(m, ShortSession.class) != null) {
+            shortSessionRequests.add(handler);
+            return false;
+        } else if (AnnotationUtils.findAnnotation(m, LongSession.class) != null) {
+            longSessionRequests.add(handler);
+            return true;
+        } else {
+            Class<?> c = m.getDeclaringClass();
+            if (AnnotationUtils.findAnnotation(c, LongSession.class) != null) {
+                longSessionRequests.add(handler);
+                return true;
+            } else {
+                shortSessionRequests.add(handler);
+                return false;
+            }
+        }
+    }
+
     private static void persist(HttpServletRequest request, HttpServletResponse response) {
-        saveSession();
+        boolean longSession = false;
+        Object o = request.getAttribute(ATTR_LONG_SESSION);
+        if (null != o) {
+            longSession = Boolean.parseBoolean(o.toString());
+        }
+        saveSession(longSession);
         saveFlash();
         Map<String, Cookie> cookies = cookie.get();
         if (null == cookies) return;
@@ -189,17 +240,17 @@ public class SessionManager extends HandlerInterceptorAdapter {
         if (!useIpAffinity) return;
         String storedFP = session.get(FP_KEY), validFP = fingerPrint();
         if (null != storedFP && S.neq(storedFP, validFP)) {
-
+            // TODO verify finger print
         }
     }
 
-    private void resolveSession(Cookie cookie, String uri) throws Exception {
+    private void resolveSession(Cookie cookie, String uri, boolean longSession) throws Exception {
         Session session = new Session();
         final long expiration = ttl * 1000L;
         String value = null == cookie ? null : cookie.getValue();
         if (S.blank(value)) {
             // no previous cookie to restore; but we have to set the timestamp in the new cookie
-            if (ttl > -1) {
+            if (!longSession && ttl > -1) {
                 session.put(TS_KEY, System.currentTimeMillis() + expiration);
             }
         } else {
@@ -215,7 +266,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
                     }
                 }
             }
-            if (ttl > -1) {
+            if (!longSession && ttl > -1) {
                 long newTimestamp = System.currentTimeMillis() + expiration;
                 // Verify that the session contains a timestamp, and that it's not expired
                 if (!session.contains(TS_KEY)) {
@@ -239,22 +290,30 @@ public class SessionManager extends HandlerInterceptorAdapter {
         listeners.accept(F.onSessionResolved(session));
     }
 
-    private static Cookie createSessionCookie(String value) {
+    private static Cookie createSessionCookie(String value, boolean longSession) {
         Cookie cookie = new Cookie(sessionCookieName, value);
         cookie.setPath("/");
         cookie.setSecure(cookieSecure);
-        if (ttl > -1 && !noPersistentCookie) {
+        if (!longSession && ttl > -1 && !noPersistentCookie) {
             cookie.setMaxAge(ttl);
         }
         return cookie;
     }
 
     static void _save() {
-        saveSession();
+        boolean longSession = false;
+        HttpServletRequest req = request();
+        if (null != req) {
+            Object o = req.getAttribute(ATTR_LONG_SESSION);
+            if (null != o) {
+                longSession = Boolean.parseBoolean(o.toString());
+            }
+        }
+        saveSession(longSession);
         saveFlash();
     }
 
-    private static void saveSession() {
+    private static void saveSession(boolean longSession) {
         Session session = session();
         if (null == session) {
             return;
@@ -267,7 +326,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         Cookie sessionCookie;
         if (session.isEmpty()) {
             // session is empty, delete it from cookie
-            sessionCookie = createSessionCookie("");
+            sessionCookie = createSessionCookie("", longSession);
         } else {
             if (ttl > -1 && !session.contains(TS_KEY)) {
                 // session get cleared before
@@ -284,7 +343,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
             try {
                 String data = URLEncoder.encode(sb.toString(), "utf-8");
                 String sign = sign(data);
-                sessionCookie = createSessionCookie(sign + "-" + data);
+                sessionCookie = createSessionCookie(sign + "-" + data, longSession);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("How come utf-8 is not recognized?");
             }

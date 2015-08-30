@@ -24,6 +24,7 @@
  * 1.2.1 - fix issue: MailerBase treat "green+1@email.com" as invalid email
  * 1.3.0 - publish application event upon rythm engine initialized
  * 1.3.2 - Allow session cookie secure be configurable (previously auto set depending on engine mode)
+ * 1.3.3 - Support long session request
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -31,7 +32,7 @@
     <groupId>org.rythmengine</groupId>
     <artifactId>spring-rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.3-SNAPSHOT</version>
 
     <name>Spring Rythm Plugin</name>
     <description>Enable Spring Application Developer to use Rythm Template Engine to render views</description>
