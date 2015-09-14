@@ -49,6 +49,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
 
     public static final String ATTR_LONG_SESSION = "__long_sess__";
     public static final String DEFAULT_COOKIE_PREFIX = "WHLAB";
+    public static final String X_COOKIE_PREFIX = "X-Cookie-";
     public static final int DEFAULT_COOKIE_EXPIRE = 60 * 60 * 24 * 30;
 
     static final Pattern SESSION_PARSER = Pattern.compile("\u0000([^:]*):([^\u0000]*)\u0000");
@@ -244,10 +245,18 @@ public class SessionManager extends HandlerInterceptorAdapter {
         }
     }
 
+    private static String xSessionName() {
+        return X_COOKIE_PREFIX + sessionCookieName;
+    }
+
     private void resolveSession(Cookie cookie, String uri, boolean longSession) throws Exception {
         Session session = new Session();
         final long expiration = ttl * 1000L;
-        String value = null == cookie ? null : cookie.getValue();
+        String x = request().getHeader(xSessionName());
+        if (S.blank(x)) {
+            x = request().getParameter(xSessionName());
+        }
+        String value = S.notBlank(x) ? x : null == cookie ? null : cookie.getValue();
         if (S.blank(value)) {
             // no previous cookie to restore; but we have to set the timestamp in the new cookie
             if (!longSession && ttl > -1) {
@@ -349,6 +358,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
             }
         }
         SessionManager.cookie.get().put(sessionCookieName, sessionCookie);
+        response().setHeader(xSessionName(), sessionCookie.getValue());
     }
 
     private void resolveFlash(Cookie cookie) {
