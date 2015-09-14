@@ -245,7 +245,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
         }
     }
 
-    private static String xSessionName() {
+    public static String xSessionName() {
         return X_COOKIE_PREFIX + sessionCookieName;
     }
 
