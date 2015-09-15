@@ -24,10 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -252,11 +249,11 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private void resolveSession(Cookie cookie, String uri, boolean longSession) throws Exception {
         Session session = new Session();
         final long expiration = ttl * 1000L;
-        String x = request().getHeader(xSessionName());
-        if (S.blank(x)) {
-            x = request().getParameter(xSessionName());
+        String x = request().getParameter(xSessionName());
+        if (S.blank(x) || S.eq("null", x)) {
+            x = request().getHeader(xSessionName());
         }
-        String value = S.notBlank(x) ? x : null == cookie ? null : cookie.getValue();
+        String value = S.notBlank(x) && S.neq("null", x) ? x : null == cookie ? null : cookie.getValue();
         if (S.blank(value)) {
             // no previous cookie to restore; but we have to set the timestamp in the new cookie
             if (!longSession && ttl > -1) {
