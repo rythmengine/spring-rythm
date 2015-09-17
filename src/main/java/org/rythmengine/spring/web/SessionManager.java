@@ -1,12 +1,10 @@
 package org.rythmengine.spring.web;
 
+import org.apache.commons.codec.Charsets;
 import org.osgl._;
 import org.osgl.logging.L;
 import org.osgl.logging.Logger;
-import org.osgl.util.C;
-import org.osgl.util.Crypto;
-import org.osgl.util.E;
-import org.osgl.util.S;
+import org.osgl.util.*;
 import org.rythmengine.spring.util.LongSession;
 import org.rythmengine.spring.util.ShortSession;
 import org.rythmengine.utils.Time;
@@ -65,6 +63,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
     private static final C.List<Listener> listeners = C.newList();
     private static String pingPath;
     private static boolean useIpAffinity;
+    private static String p3pHeader;
 
     public static void addListener(Listener listener) {
         if (!listeners.contains(listener)) {
@@ -93,6 +92,10 @@ public class SessionManager extends HandlerInterceptorAdapter {
 
     void setPingPath(String uri) {
         pingPath = uri;
+    }
+
+    void setP3Pheader(String p3p) {
+        p3pHeader = p3p;
     }
 
     @Override
@@ -148,17 +151,21 @@ public class SessionManager extends HandlerInterceptorAdapter {
             throw E.unexpected("Unknown handler type: %s", handler.getClass());
         }
         if (AnnotationUtils.findAnnotation(m, ShortSession.class) != null) {
+            System.err.println("3. adding " + m + " to long session");
             shortSessionRequests.add(handler);
             return false;
         } else if (AnnotationUtils.findAnnotation(m, LongSession.class) != null) {
+            System.err.println("3. adding " + m + " to long session");
             longSessionRequests.add(handler);
             return true;
         } else {
             Class<?> c = m.getDeclaringClass();
             if (AnnotationUtils.findAnnotation(c, LongSession.class) != null) {
+                System.err.println("4. adding " + m + " to long session");
                 longSessionRequests.add(handler);
                 return true;
             } else {
+                System.err.println("4. adding " + m + " to short session");
                 shortSessionRequests.add(handler);
                 return false;
             }
@@ -195,6 +202,9 @@ public class SessionManager extends HandlerInterceptorAdapter {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         persist(request, response);
+        if (S.notBlank(p3pHeader)) {
+            response.setHeader("P3P", p3pHeader);
+        }
     }
 
 //    public static void onRenderResult(HttpServletRequest request, HttpServletResponse response) {
@@ -250,10 +260,18 @@ public class SessionManager extends HandlerInterceptorAdapter {
         Session session = new Session();
         final long expiration = ttl * 1000L;
         String x = request().getParameter(xSessionName());
+        System.err.println(S.fmt("x session from parameter: \n\t%s, \n\turl: %s, \n\tlongSession: %s", x, request().getRequestURI(), longSession));
         if (S.blank(x) || S.eq("null", x)) {
             x = request().getHeader(xSessionName());
+            System.err.println(S.fmt("x session from header: \n\t%s, \n\turl: %s, \n\tlongSession: %s", x, request().getRequestURI(), longSession));
         }
-        String value = S.notBlank(x) && S.neq("null", x) ? x : null == cookie ? null : cookie.getValue();
+        String value = null;
+        if (S.notBlank(x) && S.neq("null", x) && !x.contains("__ID")) {
+            value = new String(Codec.decodeUrlSafeBase64(x));
+        } else if (null != cookie) {
+            value = cookie.getValue();
+        }
+        System.err.println("final session value: \n\t" + value);
         if (S.blank(value)) {
             // no previous cookie to restore; but we have to set the timestamp in the new cookie
             if (!longSession && ttl > -1) {
@@ -267,10 +285,17 @@ public class SessionManager extends HandlerInterceptorAdapter {
                 if (sign.equals(sign(data))) {
                     String sessionData = URLDecoder.decode(data, "utf-8");
                     Matcher matcher = SESSION_PARSER.matcher(sessionData);
+                    System.err.println("resolving session");
                     while (matcher.find()) {
-                        session.put(matcher.group(1), matcher.group(2));
+                        String k = matcher.group(1);
+                        String v = matcher.group(2);
+                        session.put(k, v);
+                        System.err.printf("%s: %s\n", k, v);
                     }
+                    System.err.println("eof resolving session");
                 }
+            } else {
+                System.err.println("!!!!firstDashIndex is " + firstDashIndex);
             }
             if (!longSession && ttl > -1) {
                 long newTimestamp = System.currentTimeMillis() + expiration;
@@ -285,6 +310,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
                         // Session expired
                         session = new Session();
                         session.put(EXPIRE_KEY, true);
+                        System.err.println("Session expired");
                     } else {
                         session.remove(EXPIRE_KEY);
                     }
@@ -293,6 +319,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
             }
         }
         sess.set(session);
+        System.err.printf(">>>>>>> username in session: %s\n", session.get("username"));
         listeners.accept(F.onSessionResolved(session));
     }
 
@@ -324,11 +351,6 @@ public class SessionManager extends HandlerInterceptorAdapter {
         if (null == session) {
             return;
         }
-        if (!session.changed && ttl < 0) {
-            // Nothing changed and no cookie-expire, consequently send nothing back.
-            return;
-        }
-
         Cookie sessionCookie;
         if (session.isEmpty()) {
             // session is empty, delete it from cookie
@@ -355,7 +377,10 @@ public class SessionManager extends HandlerInterceptorAdapter {
             }
         }
         SessionManager.cookie.get().put(sessionCookieName, sessionCookie);
-        response().setHeader(xSessionName(), sessionCookie.getValue());
+        String value = sessionCookie.getValue();
+        String encoded = Codec.encodeUrlSafeBase64(value);
+        System.err.printf("encoded cookie value: %s\n", encoded);
+        response().setHeader(xSessionName(), encoded);
     }
 
     private void resolveFlash(Cookie cookie) {
@@ -491,4 +516,5 @@ public class SessionManager extends HandlerInterceptorAdapter {
             }
         };
     }
+
 }

@@ -78,6 +78,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     private String sessionCookieExpire = null;
 
+    private String p3pHeader = null;
+
     private String pingPath = null;
 
     private Boolean sessionCookieSecure = null;
@@ -158,6 +160,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     public void setEnableUserAgentDetector(boolean enableUserAgentDetector) {
         this.enableUserAgentDetector = enableUserAgentDetector;
+    }
+
+    public void setP3pHeader(String p3p) {
+        p3pHeader = p3p;
     }
 
     public void setSessionSecure(boolean sessionSecure) {
@@ -405,6 +411,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
             SessionManager sm = new SessionManager();
             sm.setSessionExpire(sessionCookieExpire);
             sm.setSessionPrefix(sessionCookiePrefix);
+            sm.setP3Pheader(p3pHeader);
             sm.setCookieSecure(sessionCookieSecure);
             sm.setNoPersistentCookie(transientSessionCookie);
             sm.setPingPath(pingPath);
