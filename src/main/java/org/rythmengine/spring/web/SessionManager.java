@@ -260,10 +260,8 @@ public class SessionManager extends HandlerInterceptorAdapter {
         Session session = new Session();
         final long expiration = ttl * 1000L;
         String x = request().getParameter(xSessionName());
-        System.err.println(S.fmt("x session from parameter: \n\t%s, \n\turl: %s, \n\tlongSession: %s", x, request().getRequestURI(), longSession));
         if (S.blank(x) || S.eq("null", x)) {
             x = request().getHeader(xSessionName());
-            System.err.println(S.fmt("x session from header: \n\t%s, \n\turl: %s, \n\tlongSession: %s", x, request().getRequestURI(), longSession));
         }
         String value = null;
         if (S.notBlank(x) && S.neq("null", x) && !x.contains("__ID")) {
@@ -271,7 +269,6 @@ public class SessionManager extends HandlerInterceptorAdapter {
         } else if (null != cookie) {
             value = cookie.getValue();
         }
-        System.err.println("final session value: \n\t" + value);
         if (S.blank(value)) {
             // no previous cookie to restore; but we have to set the timestamp in the new cookie
             if (!longSession && ttl > -1) {
@@ -292,10 +289,7 @@ public class SessionManager extends HandlerInterceptorAdapter {
                         session.put(k, v);
                         System.err.printf("%s: %s\n", k, v);
                     }
-                    System.err.println("eof resolving session");
                 }
-            } else {
-                System.err.println("!!!!firstDashIndex is " + firstDashIndex);
             }
             if (!longSession && ttl > -1) {
                 long newTimestamp = System.currentTimeMillis() + expiration;
@@ -319,7 +313,6 @@ public class SessionManager extends HandlerInterceptorAdapter {
             }
         }
         sess.set(session);
-        System.err.printf(">>>>>>> username in session: %s\n", session.get("username"));
         listeners.accept(F.onSessionResolved(session));
     }
 
@@ -379,7 +372,6 @@ public class SessionManager extends HandlerInterceptorAdapter {
         SessionManager.cookie.get().put(sessionCookieName, sessionCookie);
         String value = sessionCookie.getValue();
         String encoded = Codec.encodeUrlSafeBase64(value);
-        System.err.printf("encoded cookie value: %s\n", encoded);
         response().setHeader(xSessionName(), encoded);
     }
 
