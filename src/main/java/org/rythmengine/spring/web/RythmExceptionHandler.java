@@ -1,9 +1,8 @@
 package org.rythmengine.spring.web;
 
-import org.osgl._;
+import org.osgl.Osgl;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.spring.web.result.Result;
-import org.rythmengine.spring.web.util.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -33,7 +32,7 @@ import java.util.List;
 @EnableWebMvc
 public class RythmExceptionHandler implements MessageSourceAware {
 
-    public static abstract class InternalServerErrorVisitor extends _.Visitor<Exception> {}
+    public static abstract class InternalServerErrorVisitor extends Osgl.Visitor<Exception> {}
 
     private static MessageSource messageSource;
 

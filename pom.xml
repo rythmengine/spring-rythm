@@ -26,6 +26,7 @@
  * 1.3.2 - Allow session cookie secure be configurable (previously auto set depending on engine mode)
  * 1.3.3 - Support long session request
  * 1.3.4 - Support resolve session from X-Cookie-<session name> header or query parameter
+ * 1.4.0 - Update osgl tool library to 0.8.0-SNAPSHOT
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -33,7 +34,7 @@
     <groupId>org.rythmengine</groupId>
     <artifactId>spring-rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
 
     <name>Spring Rythm Plugin</name>
     <description>Enable Spring Application Developer to use Rythm Template Engine to render views</description>
@@ -169,7 +170,7 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-tool</artifactId>
-            <version>0.7.0-SNAPSHOT</version>
+            <version>0.8.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osgl</groupId>
