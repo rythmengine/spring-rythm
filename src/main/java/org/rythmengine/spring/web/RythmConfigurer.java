@@ -335,8 +335,18 @@ public class RythmConfigurer extends RythmEngineFactory implements
     }
 
     @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> list) {
+
+    }
+
+    @Override
     public Validator getValidator() {
         return null;
+    }
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer pathMatchConfigurer) {
+
     }
 
     @Override
@@ -361,6 +371,11 @@ public class RythmConfigurer extends RythmEngineFactory implements
 
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+
+    }
+
+    @Override
+    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> list) {
 
     }
 
@@ -403,7 +418,17 @@ public class RythmConfigurer extends RythmEngineFactory implements
     }
 
     @Override
+    public void configureViewResolvers(ViewResolverRegistry viewResolverRegistry) {
+
+    }
+
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry corsRegistry) {
 
     }
 
