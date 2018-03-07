@@ -1,9 +1,28 @@
 package org.rythmengine.spring.web;
 
-import org.osgl._;
+/*-
+ * #%L
+ * Spring Rythm Plugin
+ * %%
+ * Copyright (C) 2017 - 2018 OSGL (Open Source General Library)
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import org.osgl.$;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.spring.web.result.Result;
-import org.rythmengine.spring.web.util.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -18,12 +37,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by luog on 4/12/13.
@@ -33,7 +52,7 @@ import java.util.List;
 @EnableWebMvc
 public class RythmExceptionHandler implements MessageSourceAware {
 
-    public static abstract class InternalServerErrorVisitor extends _.Visitor<Exception> {}
+    public static abstract class InternalServerErrorVisitor extends $.Visitor<Exception> {}
 
     private static MessageSource messageSource;
 
