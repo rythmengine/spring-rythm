@@ -1,5 +1,11 @@
 # Spring-Rythm Change log
 
+## 1.2.2 - 13/Mar/2018
+
+* update osgl-tool to 1.7.2
+* update osgl-mvc to 1.5.1
+* update osgl-cache to 1.3.0
+
 ## 1.2.1 - 7/Mar/2018
 
 * update osgl-tool to 1.7.0

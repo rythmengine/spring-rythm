@@ -28,9 +28,9 @@ import org.rythmengine.spring.web.UADetector;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 
 public class JSONResult extends Result {
 
@@ -77,7 +77,7 @@ public class JSONResult extends Result {
         } else if (null != array) {
             json = com.alibaba.fastjson.JSON.toJSONString(array);
         }
-        IO.writeContent(json, response.getWriter());
+        IO.write(json, response.getWriter());
         return new ModelAndView();
     }
 }
